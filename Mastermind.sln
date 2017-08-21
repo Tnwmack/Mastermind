@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomControlsLibrary", "Cu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomTypes", "CustomTypes\CustomTypes.csproj", "{7653A756-2D55-4FFB-8EAF-AA964AC47470}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MastermindTests", "MastermindTests\MastermindTests.csproj", "{2C3D752C-75B2-4B3E-8098-18E4EFA29DE7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{7653A756-2D55-4FFB-8EAF-AA964AC47470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7653A756-2D55-4FFB-8EAF-AA964AC47470}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7653A756-2D55-4FFB-8EAF-AA964AC47470}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2C3D752C-75B2-4B3E-8098-18E4EFA29DE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C3D752C-75B2-4B3E-8098-18E4EFA29DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C3D752C-75B2-4B3E-8098-18E4EFA29DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C3D752C-75B2-4B3E-8098-18E4EFA29DE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
