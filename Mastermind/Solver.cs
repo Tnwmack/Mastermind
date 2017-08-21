@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 
 namespace Mastermind
 {
+	/// <summary>
+	/// This interface is implemented by game solvers
+	/// </summary>
 	interface Solver
 	{
 		/// <summary>
-		/// Returns a new guess for the game
+		/// Gets a new guess for the game
 		/// </summary>
 		/// <param name="Board">The board in use</param>
-		/// <returns>A new guess</returns>
+		/// <returns>A new guess that should be played</returns>
 		RowState GetGuess(GameBoard Board);
 
 		/// <summary>
@@ -28,7 +31,7 @@ namespace Mastermind
 		/// <summary>
 		/// Gets a status message to display to the user
 		/// </summary>
-		/// <returns>The current status</returns>
+		/// <returns>The status to display</returns>
 		string GetMessage();
 	}
 }

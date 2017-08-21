@@ -10,18 +10,51 @@ namespace Mastermind
 	{
 		private Random Generator = new Random();
 
-		private volatile string Status = "";
+		private string Status = "";
 
+		/// <summary>
+		/// Holds settings for the solver
+		/// </summary>
 		public class GeneticSolverSettings : ICloneable
 		{
+			/// <summary>
+			/// The size of the gene pool
+			/// </summary>
 			public int PoolSize = 500;
+
+			/// <summary>
+			/// The number of crossovers to perform (pool*CrossoverAmount)
+			/// </summary>
 			public float CrossoverAmount = 0.7f;
+
+			/// <summary>
+			/// The rate that colors are mutated during a crossover
+			/// </summary>
 			public float MutationRate = 0.1f;
+
+			/// <summary>
+			/// The number top scoring pool members that do not 
+			/// undergo crossovers or mutation
+			/// </summary>
 			public int ElitismCutoff = 20;
+
+			/// <summary>
+			/// If true, the members are shufffled together randomly
+			/// If false, they are split and crossed
+			/// </summary>
 			public bool PerformUnion = false;
+
+			/// <summary>
+			/// The penalty score for correct color and spot discrepancies
+			/// </summary>
 			public int MatchScore = 50;
+
+			/// <summary>
+			/// The penalty score for correct color discrepancies
+			/// </summary>
 			public int PartialMatchScore = 20;
 
+			/// <see cref="ICloneable.Clone"/>
 			public object Clone()
 			{
 			GeneticSolverSettings Result = new GeneticSolverSettings();
@@ -369,6 +402,7 @@ namespace Mastermind
 			return new RowState(ResultColors);
 		}
 
+		/// <see cref="Solver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
 		{
 			//Use high-entropy first guesses
@@ -380,6 +414,8 @@ namespace Mastermind
 			if (Pool == null)
 				GeneratePool(Board);
 
+			//The pool must be scored and sorted prior to evolution
+			//The parent selection and elitism are based on the score
 			ScorePool(Board);
 			SortPool();
 
@@ -398,9 +434,7 @@ namespace Mastermind
 				for (i = 0; i < Board.Guesses.Count; i++)
 				{
 					if (Board.Guesses[i].Row == Pool[s].Row)
-					{
 						break;
-					}
 				}
 
 				if(i == Board.Guesses.Count)
@@ -415,6 +449,7 @@ namespace Mastermind
 			return Guess.Row;
 		}
 
+		/// <see cref="Solver.ShowSettingsDialog"/>
 		public void ShowSettingsDialog()
 		{
 			using (GeneticSettings SettDlg = new GeneticSettings())
@@ -430,12 +465,14 @@ namespace Mastermind
 			}
 		}
 
+		/// <see cref="Solver.Reset"/>
 		public void Reset()
 		{
 			Pool = null;
 			GC.Collect();
 		}
 
+		/// <see cref="Solver.GetMessage"/>
 		public string GetMessage()
 		{
 			return Status;

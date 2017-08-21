@@ -34,20 +34,25 @@ namespace Mastermind
 		{
 		const int MERGE_THRESHOLD = 50000;
 
+			//It seems to be faster to sort sections of the array in independent threads,
+			//then doing a quick merge sort on the already sorted sections.
+			//This can't be done in place however, increasing memory usage.
 			if (arr.Length > MERGE_THRESHOLD)
 			{
-				Thread[] QuickSortThreads = new Thread[Environment.ProcessorCount];
+			Thread[] QuickSortThreads = new Thread[Environment.ProcessorCount];
 
 				for (int i = 0; i < QuickSortThreads.Length; i++)
 				{
-					int Left = (arr.Length / QuickSortThreads.Length) * i;
-					int Right = Left + (arr.Length / QuickSortThreads.Length) - 1;
+				int Left = (arr.Length / QuickSortThreads.Length) * i;
+				int Right = Left + (arr.Length / QuickSortThreads.Length) - 1;
 
+					//Use a 16MB stack (default 4) to decrease the odds of a recursion stack overflow in 700,000+ element arrays
 					QuickSortThreads[i] = new Thread(new ThreadStart(delegate { QuicksortSequential(arr, Left, Right); }), 16*1024*1024);
 					QuickSortThreads[i].Priority = ThreadPriority.BelowNormal;
 					QuickSortThreads[i].Start();
 				}
 
+				//Wait for threads to finish
 				for (int i = 0; i < QuickSortThreads.Length; i++)
 				{
 					QuickSortThreads[i].Join();
@@ -96,6 +101,7 @@ namespace Mastermind
 				}
 
 				NewArr.CopyTo(arr, 0);
+				NewArr = null;
 				GC.Collect();
 			}
 			else
