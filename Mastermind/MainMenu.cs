@@ -71,6 +71,10 @@ namespace Mastermind
 					break;
 
 				case 2:
+					AI = new HybridSolver();
+					break;
+
+				case 3:
 					AI = new RandomSolver();
 					break;
 			}

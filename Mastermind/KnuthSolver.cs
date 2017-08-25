@@ -24,10 +24,10 @@ namespace Mastermind
 		/// Initializes the pool with a seed guess
 		/// </summary>
 		/// <param name="Board">The board being used</param>
-		/// <param name="SeedGuess">The initial guess</param>
-		private void FillPool(GameBoard Board, BoardRow SeedGuess)
+		/// <param name="SeedRow">The initial guess row index</param>
+		private void FillPool(GameBoard Board, int SeedRow)
 		{
-			FillPool(Board, null, 0, SeedGuess);
+			FillPool(Board, null, 0, SeedRow);
 		}
 
 		/// <summary>
@@ -36,8 +36,8 @@ namespace Mastermind
 		/// <param name="Board">The board being used</param>
 		/// <param name="Colors">The current color row being processed, used for recursion</param>
 		/// <param name="Column">The current column in the color row, used for recursion</param>
-		/// <param name="SeedGuess">The initial guess</param>
-		private void FillPool(GameBoard Board, byte[] Colors, int Column, BoardRow SeedGuess)
+		/// <param name="SeedRow">The initial guess row index</param>
+		private void FillPool(GameBoard Board, byte[] Colors, int Column, int SeedRow)
 		{
 			if(Column == 0) //Initial case
 			{
@@ -52,7 +52,7 @@ namespace Mastermind
 				byte[] ColorThread = new byte[Board.NumColumns];
 					ColorThread[0] = (byte)i;
 
-					FillThreads[i] = new Thread(new ThreadStart(delegate { FillPool(Board, ColorThread, Column + 1, SeedGuess); }));
+					FillThreads[i] = new Thread(new ThreadStart(delegate { FillPool(Board, ColorThread, Column + 1, SeedRow); }));
 					FillThreads[i].Priority = ThreadPriority.BelowNormal;
 					FillThreads[i].Start();
 				}
@@ -70,9 +70,18 @@ namespace Mastermind
 					Colors[Column] = (byte)c;
 
 				RowState NewMember = new RowState(Colors);
+				int r = 0;
+
+					for (r = 0; r < SeedRow + 1; r++)
+					{
+						if (!IsConsistent(NewMember, Board.Guesses[r]))
+						{
+							break;
+						}
+					}
 
 					//If the current row is a possible solution, add it to the pool
-					if (IsConsistent(NewMember, SeedGuess))
+					if (r == SeedRow + 1)
 					{
 						//This lock is kind of slow, but using multiple 
 						//pools with a final merge doesn't seem to be faster.
@@ -89,7 +98,7 @@ namespace Mastermind
 				for (int c = 0; c < Board.NumColors; c++)
 				{
 					Colors[Column] = (byte)c;
-					FillPool(Board, Colors, Column + 1, SeedGuess);
+					FillPool(Board, Colors, Column + 1, SeedRow);
 				}
 			}
 		}
@@ -98,9 +107,9 @@ namespace Mastermind
 		/// Create and fill the guess pool
 		/// </summary>
 		/// <param name="Board">The board being used</param>
-		/// <param name="SeedGuess">The initial guess</param>
+		/// <param name="SeedRow">The initial guess row index</param>
 		/// <returns></returns>
-		private bool GeneratePool(GameBoard Board, BoardRow SeedGuess)
+		private bool GeneratePool(GameBoard Board, int SeedRow)
 		{
 		//Get a rough estimate of the final pool size
 		//Since the pool is only filled with possible solutions, it's hard to guess the final pool size.
@@ -127,7 +136,7 @@ namespace Mastermind
 
 			//Fill the pool with recursion
 			Pool = new LinkedList<RowState>();
-			FillPool(Board, SeedGuess);
+			FillPool(Board, SeedRow);
 
 			return true;
 		}
@@ -232,7 +241,7 @@ namespace Mastermind
 
 			if (Pool == null)
 			{
-				if (!GeneratePool(Board, Board.Guesses.Last()))
+				if (!GeneratePool(Board, Board.Guesses.Count - 1))
 					return new RowState(new byte[Board.NumColumns]);
 			}
 			else

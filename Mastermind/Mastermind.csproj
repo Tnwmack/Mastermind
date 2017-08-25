@@ -81,6 +81,7 @@
       <DependentUpon>GeneticSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="GeneticSolver.cs" />
+    <Compile Include="HybridSolver.cs" />
     <Compile Include="KnuthSolver.cs" />
     <Compile Include="MainMenu.cs">
       <SubType>Form</SubType>

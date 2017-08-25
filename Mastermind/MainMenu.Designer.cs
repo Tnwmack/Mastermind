@@ -58,6 +58,7 @@
 			this.AITypeComboBox.Items.AddRange(new object[] {
             "Knuth Solver",
             "Genetic Solver",
+            "Hybrid Solver",
             "Random Solver"});
 			this.AITypeComboBox.Location = new System.Drawing.Point(12, 12);
 			this.AITypeComboBox.Name = "AITypeComboBox";
