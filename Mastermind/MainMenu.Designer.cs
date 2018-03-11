@@ -38,6 +38,7 @@
 			this.SolverStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.GameBoardControl = new CustomControlsLibrary.BoardControl();
 			this.AnswerKeyControl = new CustomControlsLibrary.AnswerControl();
+			this.TestButton = new System.Windows.Forms.Button();
 			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -89,7 +90,7 @@
 			// GameStateLabel
 			// 
 			this.GameStateLabel.AutoSize = true;
-			this.GameStateLabel.Location = new System.Drawing.Point(12, 152);
+			this.GameStateLabel.Location = new System.Drawing.Point(12, 181);
 			this.GameStateLabel.Name = "GameStateLabel";
 			this.GameStateLabel.Size = new System.Drawing.Size(35, 13);
 			this.GameStateLabel.TabIndex = 7;
@@ -97,7 +98,7 @@
 			// 
 			// ResetButton
 			// 
-			this.ResetButton.Location = new System.Drawing.Point(12, 126);
+			this.ResetButton.Location = new System.Drawing.Point(12, 155);
 			this.ResetButton.Name = "ResetButton";
 			this.ResetButton.Size = new System.Drawing.Size(100, 23);
 			this.ResetButton.TabIndex = 8;
@@ -147,11 +148,22 @@
 			this.AnswerKeyControl.Text = "AnswerKeyControl";
 			this.AnswerKeyControl.OnAnswerChanged += new CustomControlsLibrary.AnswerControl.OnAnswerChangedDelegate(this.AnswerKeyControl_OnAnswerChanged);
 			// 
+			// TestButton
+			// 
+			this.TestButton.Location = new System.Drawing.Point(12, 126);
+			this.TestButton.Name = "TestButton";
+			this.TestButton.Size = new System.Drawing.Size(100, 23);
+			this.TestButton.TabIndex = 11;
+			this.TestButton.Text = "Run Test";
+			this.TestButton.UseVisualStyleBackColor = true;
+			this.TestButton.Click += new System.EventHandler(this.TestButton_Click);
+			// 
 			// MainMenu
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(339, 593);
+			this.Controls.Add(this.TestButton);
 			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.ResetButton);
 			this.Controls.Add(this.GameStateLabel);
@@ -186,6 +198,7 @@
 		private System.Windows.Forms.Button ResetButton;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripStatusLabel SolverStatusLabel;
+		private System.Windows.Forms.Button TestButton;
 	}
 }
 

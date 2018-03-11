@@ -178,5 +178,71 @@ namespace Mastermind
 
 			GenerateGame(NewAnswer);
 		}
+
+		private void TestButton_Click(object sender, EventArgs e)
+		{
+			if (GuessThreadWorking)
+				return;
+
+			TestForm TestingForm = new TestForm();
+			//Events called in seprate thread
+			TestingForm.OnRunClicked += TestingForm_OnRunClicked;
+			TestingForm.OnStopClicked += TestingForm_OnCancelClicked;
+
+			TestingForm.ShowDialog();
+		}
+
+		private volatile bool CancelTesting;
+
+		private void TestingForm_OnCancelClicked(TestForm Sender)
+		{
+			CancelTesting = true;
+		}
+
+		private void TestingForm_OnRunClicked(TestForm Sender, int Iterations)
+		{
+			CancelTesting = false;
+			Random Rand = new Random();
+			System.Diagnostics.Stopwatch Timer = new System.Diagnostics.Stopwatch();
+
+			List<int> NumGuesses = new List<int>();
+			List<double> ProcessTime = new List<double>();
+			int Failed = 0;
+
+			for (int i = 0; i < Iterations && !CancelTesting; i ++)
+			{
+				RowState Answer = RowState.GetRandomColors(Rand, Settings.Colors, Settings.Columns);
+				GameBoard Board = new GameBoard(Settings.Colors, Settings.Columns, Settings.Rows, Answer);
+				Game TestGame = new Game(Board, AI);
+
+				int GuessRow = 0;
+
+				Timer.Restart();
+
+				for (; GuessRow < Settings.Rows; GuessRow++)
+				{
+					TestGame.GenerateGuess();
+
+					if (TestGame.Board.CurrentGameState != GameBoard.GameState.InProgress)
+						break;
+				}
+				
+				Timer.Stop();
+
+				if (TestGame.Board.CurrentGameState == GameBoard.GameState.Lost)
+				{
+					Failed++;
+				}
+
+				NumGuesses.Add(GuessRow + 1);
+				ProcessTime.Add(Timer.Elapsed.TotalSeconds);
+
+				AI.Reset();
+
+				Sender.UpdateResults(i + 1, ProcessTime.Average(), NumGuesses.Average(), Failed);
+			}
+
+			Sender.OnTestsCompleted();
+		}
 	}
 }
