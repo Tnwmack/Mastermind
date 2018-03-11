@@ -107,7 +107,7 @@ namespace Mastermind
 
 					for (int r = 0; r < SeedRows; r++)
 					{
-						if (!IsConsistent(NewMember, Board.Guesses[r]))
+						if (!IsConsistent(NewMember, Board.Guesses[r], Board))
 						{
 							Consistent = false;
 							break;
@@ -231,12 +231,12 @@ namespace Mastermind
 		/// <param name="Colors">The row to check</param>
 		/// <param name="Row">A played row with score</param>
 		/// <returns>True if the row can be a solution</returns>
-		private bool IsConsistent(RowState Colors, BoardRow Row)
+		private bool IsConsistent(RowState Colors, BoardRow Row, GameBoard Board)
 		{
 		int SamePosAndColor = 0, SameColor = 0;
 
-			/*if (Colors == Board.Answer)
-				System.Diagnostics.Debugger.Break();*/
+			if (Colors == Board.Answer)
+				System.Diagnostics.Debugger.Break();
 
 			//Optimization, counting backwards is supposedly faster since a NZ test is faster than a less than
 			for (int i = Colors.Length - 1; i >= 0; i--)
@@ -289,7 +289,7 @@ namespace Mastermind
 
 					while(Pool.TryTake(out Row))
 					{
-						if (IsConsistent(Row, LastGuess))
+						if (IsConsistent(Row, LastGuess, Board))
 						{
 							NewPool.Add(Row);
 						}
@@ -328,6 +328,7 @@ namespace Mastermind
 		/// <see cref="Solver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
 		{
+			//TODO: Add seprate module for seed guesses
 			if(Board.Guesses.Count == 0)
 			{
 			//This guess pattern is recommended by Knuth
