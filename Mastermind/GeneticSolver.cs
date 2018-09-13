@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Mastermind
 {
-	class GeneticSolver : Solver
+	public class GeneticSolver : Solver
 	{
 		private Random Generator = new Random();
 
@@ -30,19 +30,13 @@ namespace Mastermind
 			/// <summary>
 			/// The rate that colors are mutated during a crossover
 			/// </summary>
-			public float MutationRate = 0.1f;
+			public float MutationRate = 0.25f;
 
 			/// <summary>
 			/// The number top scoring pool members that do not 
 			/// undergo crossovers or mutation
 			/// </summary>
 			public int ElitismCutoff = 20;
-
-			/// <summary>
-			/// If true, the members are shufffled together randomly
-			/// If false, they are split and crossed
-			/// </summary>
-			public bool PerformUnion = false;
 
 			/// <summary>
 			/// The penalty score for correct color and spot discrepancies
@@ -54,20 +48,24 @@ namespace Mastermind
 			/// </summary>
 			public int PartialMatchScore = 20;
 
+			/// <summary>
+			/// The maximum number of generations before forcing a guess
+			/// </summary>
+			public int MaxGenerations = 200;
+
 			/// <see cref="ICloneable.Clone"/>
 			public object Clone()
 			{
-			GeneticSolverSettings Result = new GeneticSolverSettings();
-
-				Result.PoolSize = PoolSize;
-				Result.CrossoverAmount = CrossoverAmount;
-				Result.MutationRate = MutationRate;
-				Result.ElitismCutoff = ElitismCutoff;
-				Result.PerformUnion = PerformUnion;
-				Result.MatchScore = MatchScore;
-				Result.PartialMatchScore = PartialMatchScore;
-
-				return Result;
+                return new GeneticSolverSettings
+                {
+                    PoolSize = PoolSize,
+                    CrossoverAmount = CrossoverAmount,
+                    MutationRate = MutationRate,
+                    ElitismCutoff = ElitismCutoff,
+                    MatchScore = MatchScore,
+                    PartialMatchScore = PartialMatchScore,
+					MaxGenerations = MaxGenerations
+				};
 			}
 		}
 
@@ -90,6 +88,7 @@ namespace Mastermind
 		private PoolMember[] Pool;
 		private float[] CDF;
 		private List<int>[] IndexBuckets;
+		private int Generations = 0;
 
 		public GeneticSolver()
 		{
@@ -153,8 +152,9 @@ namespace Mastermind
 		/// <returns>0 if the row is a possible fit, decreasing values the worse the fit is</returns>
 		private int CompareRows(RowState Row, BoardRow PlayedRow)
 		{
-		bool[] Matched = new bool[Row.Length];
-		int SamePosAndColor = 0, SameColor = 0;
+		bool[] RowMatched = new bool[Row.Length];
+        bool[] GuessMatched = new bool[Row.Length];
+        int SamePosAndColor = 0, SameColor = 0;
 		int Score = 0;
 
 			for (int i = 0; i < Row.Length; i++)
@@ -162,63 +162,30 @@ namespace Mastermind
 				if (Row[i] == PlayedRow.Row[i])
 				{
 					SamePosAndColor++;
-				}
+                    RowMatched[i] = GuessMatched[i] = true;
+                }
 			}
 
 		int MatchDifference = Math.Abs(PlayedRow.Score.NumCorrectSpot - SamePosAndColor);
-			Score -= MatchDifference * Settings.MatchScore;
+			Score -= Settings.MatchScore * MatchDifference;
 
 			for (int i = 0; i < Row.Length; i++)
 			{
-				for (int j = 0; j < Row.Length; j++)
+				for (int j = 0; j < Row.Length && !RowMatched[i]; j++)
 				{
-					if ((Row[i] == PlayedRow.Row[j]) && !Matched[j])
+					if ((Row[i] == PlayedRow.Row[j]) && !GuessMatched[j])
 					{
 						SameColor++;
-						Matched[j] = true;
+						GuessMatched[j] = true;
+						break;
 					}
 				}
 			}
 
-		int ColorDifference = Math.Abs(PlayedRow.Score.NumCorrectColor - (SameColor - SamePosAndColor));
+		int ColorDifference = Math.Abs(PlayedRow.Score.NumCorrectColor - SameColor);
 			Score -= Settings.PartialMatchScore * ColorDifference;
 
 			return Score;
-
-
-
-			/*bool[] Matched = new bool[Row.Length];
-			int SamePosAndColor = 0, SameColor = 0;
-			int Score = 0;
-
-				for (int i = 0; i < Row.Length; i++)
-				{
-					if (Row[i] == PlayedRow.Row[i])
-					{
-						SamePosAndColor++;
-						Matched[i] = true;
-					}
-				}
-
-			int MatchDifference = Math.Abs(PlayedRow.Score.NumCorrectSpot - SamePosAndColor);
-				Score -= MatchDifference * Settings.MatchScore;
-
-				for (int i = 0; i < Row.Length; i++)
-				{
-					for (int j = 0; j < Row.Length; j++)
-					{
-						if (i != j && Row[i] == PlayedRow.Row[j] && !Matched[j])
-						{
-							SameColor++;
-							Matched[j] = true;
-						}
-					}
-				}
-
-			int ColorDifference = Math.Abs(PlayedRow.Score.NumCorrectColor - SameColor);
-				Score -= Settings.PartialMatchScore * ColorDifference;
-
-				return Score;*/
 		}
 
 		/// <summary>
@@ -291,138 +258,135 @@ namespace Mastermind
 		/// </summary>
 		private void Evolve(GameBoard Board)
 		{
-		int Crossovers = (int)(Pool.Length * Settings.CrossoverAmount);
-		int Columns = Pool[0].Row.Length;
-		byte[] ColorA = new byte[Columns];
-		byte[] ColorB = new byte[Columns];
+			ScorePool(Board);
+			SortPool();
 
-			for (int Cross = 0; Cross < Crossovers; Cross++)
+			Generations = 0;
+
+			//Keep evolving until a possible solution is found, or a max number of generations have occured
+			for (int i = 0; i < Settings.MaxGenerations && Pool[0].Score != 0; i++)
 			{
-				int IndexA = SelectParent(0.5f);
-				int IndexB = SelectParent(0.5f);
+				PerformEvolveOperation(Board);
+				ScorePool(Board);
+				SortPool();
 
-				//int IndexA = Parents[Cross * 2];
-				//int IndexB = Parents[Cross * 2 + 1];
-
-				Pool[IndexA].Row.CopyTo(ColorA);
-				Pool[IndexB].Row.CopyTo(ColorB);
-
-				//Perform a full random union operation
-				if (Settings.PerformUnion)
-				{
-					for (int i = 0; i < 8; i++)
-					{
-						for (int j = 0; j < Columns; j++)
-						{
-							int Swap = Generator.Next(Columns);
-							byte Temp = ColorA[j];
-
-							ColorA[j] = ColorB[Swap];
-							ColorB[Swap] = Temp;
-						}
-					}
-				}
-				else
-				{
-					//Perform a random linear crossover
-					int CrossPoint = Generator.Next(Columns);
-
-					for (int i = CrossPoint; i < Columns; i++)
-					{
-						byte Temp = ColorA[i];
-
-						ColorA[i] = ColorB[i];
-						ColorB[i] = Temp;
-					}
-				}
-
-				//Do mutations
-				for (int i = 0; i < Columns; i++)
-				{
-					if (Generator.NextDouble() < Settings.MutationRate)
-						ColorA[i] = (byte)Generator.Next(Board.NumColors);
-
-					if (Generator.NextDouble() < Settings.MutationRate)
-						ColorB[i] = (byte)Generator.Next(Board.NumColors);
-				}
-
-				Pool[IndexA].Row = new RowState(ColorA);
-				Pool[IndexB].Row = new RowState(ColorB);
+				Generations++;
 			}
 		}
 
 		/// <summary>
-		/// Gets a random guess that maximises the colors used
+		/// Performs the selection, crossover and mutation operations on the pool
 		/// </summary>
-		/// <param name="Board">The board in use</param>
-		/// <returns>A random guess</returns>
-		private RowState GetNoisyGuess(GameBoard Board)
+		private void PerformEvolveOperation(GameBoard Board)
 		{
-		byte[] ResultColors = new byte[Board.NumColumns];
+		int Crossovers = (int)(Pool.Length * Settings.CrossoverAmount);
+		int Columns = Pool[0].Row.Length;
+		byte[] ColorA = new byte[Columns];
+		byte[] ColorB = new byte[Columns];
+		byte[] NewColorA = new byte[Columns];
+		byte[] NewColorB = new byte[Columns];
+		int[] ShuffleIndex = new int[Columns * 2];
 
-			if (Board.NumColors <= Board.NumColumns)
+			for(int i = 0; i < ShuffleIndex.Length; i ++)
+				ShuffleIndex[i] = i;
+
+		PoolMember[] NewPool = new PoolMember[Settings.PoolSize];
+		int NewPoolIndex = 0;
+
+			//Copy elite members
+			for (int e = 0; e < Settings.ElitismCutoff; e ++)
 			{
-			byte Color = 0;
-
-				for (int i = 0; i < ResultColors.Length; i++)
-				{
-					ResultColors[i] = Color;
-
-					Color ++;
-					Color = (byte)(Color % Board.NumColors);
-				}
-
-				//Randomize order
-				for (int i = 0; i < 8; i++)
-				{
-					for (int j = 0; j < ResultColors.Length; j++)
-					{
-					int Index = Generator.Next(ResultColors.Length);
-					byte Temp = ResultColors[j];
-						ResultColors[j] = ResultColors[Index];
-						ResultColors[Index] = Temp;
-					}
-				}
-			}
-			else
-			{
-			byte[] Colors = new byte[Board.NumColors];
-
-				//Generate array of colors
-				for (int i = 0; i < Colors.Length; i++)
-					Colors[i] = (byte)i;
-
-				for (int i = 0; i < ResultColors.Length; i++)
-				{
-				int Index = Generator.Next(Colors.Length);
-					ResultColors[i] = Colors[Index];
-				}
+				NewPool[e] = Pool[e];
 			}
 
-			return new RowState(ResultColors);
+			NewPoolIndex = Settings.ElitismCutoff;
+
+			//Do Crossover members
+			for (int Cross = 0; Cross < Crossovers / 2; Cross += 2, NewPoolIndex += 2)
+			{
+			int IndexA = SelectParent(0.5f);
+			int IndexB = SelectParent(0.5f);
+
+				Pool[IndexA].Row.CopyTo(ColorA);
+				Pool[IndexB].Row.CopyTo(ColorB);
+
+				for(int i = 0; i < ShuffleIndex.Length; i ++)
+				{
+					int Swap = Generator.Next(ShuffleIndex.Length);
+					int Temp = ShuffleIndex[Swap];
+					ShuffleIndex[Swap] = ShuffleIndex[i];
+					ShuffleIndex[i] = Temp;
+				}
+
+				for (int i = 0; i < Columns; i ++)
+				{
+					byte Color = 0;
+
+					if (ShuffleIndex[i] < Columns)
+						Color = ColorA[ShuffleIndex[i]];
+					else
+						Color = ColorB[ShuffleIndex[i] - Columns];
+
+					NewColorA[i] = Color;
+				}
+
+				for (int i = Columns; i < Columns * 2; i++)
+				{
+					byte Color = 0;
+
+					if (ShuffleIndex[i] < Columns)
+						Color = ColorA[ShuffleIndex[i]];
+					else
+						Color = ColorB[ShuffleIndex[i] - Columns];
+
+					NewColorB[i - Columns] = Color;
+				}
+
+				NewPool[NewPoolIndex].Row = new RowState(NewColorA);
+				NewPool[NewPoolIndex + 1].Row = new RowState(NewColorB);
+			}
+
+			//Mutations
+			for(; NewPoolIndex < NewPool.Length; NewPoolIndex ++)
+			{
+				int Parent = SelectParent(0.5f);
+				Pool[Parent].Row.CopyTo(NewColorA);
+
+				bool[] Selected = new bool[Columns];
+
+				int MutationIndex = 0;
+				int NumMutations = (int)(Columns * Settings.MutationRate);
+
+				while(MutationIndex < NumMutations)
+				{
+					int Column = (int)(Generator.NextDouble() * Columns);
+
+					if (Selected[Column])
+						continue;
+
+					Selected[Column] = true;
+					NewColorA[Column] = (byte)(Generator.NextDouble() * Board.NumColors);
+					MutationIndex++;
+				}
+
+				NewPool[NewPoolIndex].Row = new RowState(NewColorA);
+			}
+
+			Pool = NewPool;
 		}
 
 		/// <see cref="Solver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
 		{
-			//Use high-entropy first guesses
-			if( (Board.Guesses.Count == 0) || (Board.Guesses.Count == 1))
-			{
-				return GetNoisyGuess(Board);
-			}
+			//Do a seed guess
+			if (Board.Guesses.Count < 2 || (Board.Guesses.Count == 2 && Board.NumColumns > 6 && Board.NumColors > 5))
+				return SeedGuess.GetGuess(Board, (byte)Board.Guesses.Count);
 
 			if (Pool == null)
 				GeneratePool(Board);
 
-			//The pool must be scored and sorted prior to evolution
-			//The parent selection and elitism are based on the score
-			ScorePool(Board);
-			SortPool();
-
+			//Perform pool evolution
 			Evolve(Board);
-
-			ScorePool(Board);
-			SortPool();
 
 		PoolMember Guess = new PoolMember();
 
@@ -444,7 +408,8 @@ namespace Mastermind
 				}
 			}
 
-			Status = "Top Guess Score: " + Guess.Score.ToString();
+			Status = string.Format("Best Score: {0}, Generations: {1}", 
+				Guess.Score, Generations);
 
 			return Guess.Row;
 		}

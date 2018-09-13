@@ -42,14 +42,15 @@
 			this.label5 = new System.Windows.Forms.Label();
 			this.PartialTextBox = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
-			this.UnionCheckBox = new System.Windows.Forms.CheckBox();
 			this.helpProvider1 = new System.Windows.Forms.HelpProvider();
+			this.GenerationsTextBox = new System.Windows.Forms.TextBox();
+			this.label7 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// OKButton
 			// 
 			this.OKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-			this.OKButton.Location = new System.Drawing.Point(12, 191);
+			this.OKButton.Location = new System.Drawing.Point(12, 194);
 			this.OKButton.Name = "OKButton";
 			this.OKButton.Size = new System.Drawing.Size(75, 23);
 			this.OKButton.TabIndex = 7;
@@ -60,7 +61,7 @@
 			// CanButton
 			// 
 			this.CanButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.CanButton.Location = new System.Drawing.Point(93, 191);
+			this.CanButton.Location = new System.Drawing.Point(93, 194);
 			this.CanButton.Name = "CanButton";
 			this.CanButton.Size = new System.Drawing.Size(75, 23);
 			this.CanButton.TabIndex = 8;
@@ -70,7 +71,7 @@
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(33, 15);
+			this.label1.Location = new System.Drawing.Point(40, 15);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(54, 13);
 			this.label1.TabIndex = 2;
@@ -79,7 +80,7 @@
 			// PoolSizeTextBox
 			// 
 			this.helpProvider1.SetHelpString(this.PoolSizeTextBox, "The size of the pool. Default: 500");
-			this.PoolSizeTextBox.Location = new System.Drawing.Point(93, 12);
+			this.PoolSizeTextBox.Location = new System.Drawing.Point(100, 12);
 			this.PoolSizeTextBox.Name = "PoolSizeTextBox";
 			this.helpProvider1.SetShowHelp(this.PoolSizeTextBox, true);
 			this.PoolSizeTextBox.Size = new System.Drawing.Size(100, 20);
@@ -90,7 +91,7 @@
 			// 
 			this.helpProvider1.SetHelpString(this.CrossoversTextBox, "The ratio of crossovers that take place. Eg: 0.5 = 0.5*poolsize crossovers will b" +
         "e performed. Default: 0.7");
-			this.CrossoversTextBox.Location = new System.Drawing.Point(93, 38);
+			this.CrossoversTextBox.Location = new System.Drawing.Point(100, 38);
 			this.CrossoversTextBox.Name = "CrossoversTextBox";
 			this.helpProvider1.SetShowHelp(this.CrossoversTextBox, true);
 			this.CrossoversTextBox.Size = new System.Drawing.Size(100, 20);
@@ -100,7 +101,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(25, 41);
+			this.label2.Location = new System.Drawing.Point(32, 41);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(62, 13);
 			this.label2.TabIndex = 4;
@@ -108,8 +109,8 @@
 			// 
 			// MutationTextBox
 			// 
-			this.helpProvider1.SetHelpString(this.MutationTextBox, "The rate of color mutations when a crossover is performed. Default: 0.1");
-			this.MutationTextBox.Location = new System.Drawing.Point(93, 64);
+			this.helpProvider1.SetHelpString(this.MutationTextBox, "The number of columns mutated after a parent is selected. Default: 0.25");
+			this.MutationTextBox.Location = new System.Drawing.Point(100, 64);
 			this.MutationTextBox.Name = "MutationTextBox";
 			this.helpProvider1.SetShowHelp(this.MutationTextBox, true);
 			this.MutationTextBox.Size = new System.Drawing.Size(100, 20);
@@ -119,7 +120,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(10, 67);
+			this.label3.Location = new System.Drawing.Point(17, 67);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(77, 13);
 			this.label3.TabIndex = 6;
@@ -128,7 +129,7 @@
 			// ElitismTextBox
 			// 
 			this.helpProvider1.SetHelpString(this.ElitismTextBox, "This many of the top pool members will not be crossed or mutated. Default: 20");
-			this.ElitismTextBox.Location = new System.Drawing.Point(93, 90);
+			this.ElitismTextBox.Location = new System.Drawing.Point(100, 90);
 			this.ElitismTextBox.Name = "ElitismTextBox";
 			this.helpProvider1.SetShowHelp(this.ElitismTextBox, true);
 			this.ElitismTextBox.Size = new System.Drawing.Size(100, 20);
@@ -138,7 +139,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(17, 93);
+			this.label4.Location = new System.Drawing.Point(24, 93);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(70, 13);
 			this.label4.TabIndex = 8;
@@ -147,7 +148,7 @@
 			// MatchTextBox
 			// 
 			this.helpProvider1.SetHelpString(this.MatchTextBox, "The score weight of matching color and column in evaluation. Default: 50");
-			this.MatchTextBox.Location = new System.Drawing.Point(93, 116);
+			this.MatchTextBox.Location = new System.Drawing.Point(100, 116);
 			this.MatchTextBox.Name = "MatchTextBox";
 			this.helpProvider1.SetShowHelp(this.MatchTextBox, true);
 			this.MatchTextBox.Size = new System.Drawing.Size(100, 20);
@@ -157,7 +158,7 @@
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(16, 119);
+			this.label5.Location = new System.Drawing.Point(23, 119);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(71, 13);
 			this.label5.TabIndex = 10;
@@ -166,7 +167,7 @@
 			// PartialTextBox
 			// 
 			this.helpProvider1.SetHelpString(this.PartialTextBox, "The score weight of matching color but not column in evaluation. Default: 20");
-			this.PartialTextBox.Location = new System.Drawing.Point(93, 142);
+			this.PartialTextBox.Location = new System.Drawing.Point(100, 142);
 			this.PartialTextBox.Name = "PartialTextBox";
 			this.helpProvider1.SetShowHelp(this.PartialTextBox, true);
 			this.PartialTextBox.Size = new System.Drawing.Size(100, 20);
@@ -176,23 +177,30 @@
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(17, 145);
+			this.label6.Location = new System.Drawing.Point(24, 145);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(70, 13);
 			this.label6.TabIndex = 12;
 			this.label6.Text = "Partial Score:";
 			// 
-			// UnionCheckBox
+			// GenerationsTextBox
 			// 
-			this.UnionCheckBox.AutoSize = true;
-			this.helpProvider1.SetHelpString(this.UnionCheckBox, "If on, child genes will be mixed, if off they will be split. Default: off");
-			this.UnionCheckBox.Location = new System.Drawing.Point(67, 168);
-			this.UnionCheckBox.Name = "UnionCheckBox";
-			this.helpProvider1.SetShowHelp(this.UnionCheckBox, true);
-			this.UnionCheckBox.Size = new System.Drawing.Size(126, 17);
-			this.UnionCheckBox.TabIndex = 6;
-			this.UnionCheckBox.Text = "Use Union Crossover";
-			this.UnionCheckBox.UseVisualStyleBackColor = true;
+			this.helpProvider1.SetHelpString(this.GenerationsTextBox, "The maximum number of times to evolve the pool before giving up and guessing. Def" +
+        "ault: 200");
+			this.GenerationsTextBox.Location = new System.Drawing.Point(100, 168);
+			this.GenerationsTextBox.Name = "GenerationsTextBox";
+			this.helpProvider1.SetShowHelp(this.GenerationsTextBox, true);
+			this.GenerationsTextBox.Size = new System.Drawing.Size(100, 20);
+			this.GenerationsTextBox.TabIndex = 6;
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(4, 171);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(90, 13);
+			this.label7.TabIndex = 14;
+			this.label7.Text = "Max Generations:";
 			// 
 			// GeneticSettings
 			// 
@@ -200,8 +208,9 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.CanButton;
-			this.ClientSize = new System.Drawing.Size(206, 226);
-			this.Controls.Add(this.UnionCheckBox);
+			this.ClientSize = new System.Drawing.Size(212, 230);
+			this.Controls.Add(this.label7);
+			this.Controls.Add(this.GenerationsTextBox);
 			this.Controls.Add(this.PartialTextBox);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.MatchTextBox);
@@ -245,7 +254,8 @@
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox PartialTextBox;
 		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.CheckBox UnionCheckBox;
 		private System.Windows.Forms.HelpProvider helpProvider1;
+		private System.Windows.Forms.TextBox GenerationsTextBox;
+		private System.Windows.Forms.Label label7;
 	}
 }

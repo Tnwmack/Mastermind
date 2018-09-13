@@ -97,7 +97,7 @@ namespace Mastermind
 			ElitismTextBox.Text = Settings.ElitismCutoff.ToString();
 			MatchTextBox.Text = Settings.MatchScore.ToString();
 			PartialTextBox.Text = Settings.PartialMatchScore.ToString();
-			UnionCheckBox.Checked = Settings.PerformUnion;
+			GenerationsTextBox.Text = Settings.MaxGenerations.ToString();
 		}
 
 		private bool ValidateAll()
@@ -120,6 +120,9 @@ namespace Mastermind
 			if (!ValidateBox<Int32>(PartialTextBox))
 				return false;
 
+			if (!ValidateBox<Int32>(GenerationsTextBox))
+				return false;
+
 			return true;
 		}
 
@@ -136,7 +139,7 @@ namespace Mastermind
 				Settings.ElitismCutoff = int.Parse(ElitismTextBox.Text);
 				Settings.MatchScore = int.Parse(MatchTextBox.Text);
 				Settings.PartialMatchScore = int.Parse(PartialTextBox.Text);
-				Settings.PerformUnion = UnionCheckBox.Checked;
+				Settings.MaxGenerations = int.Parse(GenerationsTextBox.Text);
 			}
 		}
 	}
