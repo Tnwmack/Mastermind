@@ -58,6 +58,21 @@ namespace Mastermind
 			/// </summary>
 			public bool LinearCrossover = true;
 
+			/// <summary>
+			/// Varies the crossover amount based on vertain criteria. CrossoverAmount is ignored.
+			/// </summary>
+			public bool DynamicCrossoverAmount = false;
+
+			/// <summary>
+			/// Varies the mutation rate based on vertain criteria. MutationRate is ignored.
+			/// </summary>
+			public bool DynamicMutationRate = true;
+
+			/// <summary>
+			/// Pool members with less than this score are elimininated, 0 to disable.
+			/// </summary>
+			public int ScoreCutoff = -500;
+
 			/// <see cref="ICloneable.Clone"/>
 			public object Clone()
 			{
@@ -202,17 +217,36 @@ namespace Mastermind
 		/// Selects a suitable parent for crossover operations
 		/// </summary>
 		/// <returns>A parent index to use</returns>
-		private int SelectParent()
+		private int SelectParent(int MaxIndex)
 		{
+			int UsablePoolSize = Math.Min(MaxIndex, Pool.Length);
 			//P(x) = -1*x + 1
 			//CDF(X) = -(1/2)x^2 + x = y
 			//X = 1 - (1 - 2*y)^(1/2)
 			float y = (float)Generator.NextDouble() * 0.5f;
 			float x = 1.0f - (float)Math.Sqrt(1.0f - 2.0f * y);
-			x *= Pool.Length;
+			x *= UsablePoolSize;
 			int Result = (int)Math.Floor(x);
 
-			return Result < Pool.Length ? Result : Pool.Length - 1; //This actually can happen
+			return Result < UsablePoolSize ? Result : UsablePoolSize - 1; //This actually can happen
+		}
+
+		/// <summary>
+		/// Gets the index for the minimum score cutoff 
+		/// </summary>
+		/// <returns>The index of the pool member that exceeds the cutoff value</returns>
+		private int GetEugenicsIndex()
+		{
+			if (Settings.ScoreCutoff == 0)
+				return Pool.Length;
+
+			for (int i = 0; i < Pool.Length; i ++)
+			{
+				if (Pool[i].Score < Settings.ScoreCutoff)
+					return i;
+			}
+
+			return Pool.Length;
 		}
 
 		/// <summary>
@@ -242,8 +276,8 @@ namespace Mastermind
 		/// </summary>
 		private void PerformEvolveOperations(GameBoard Board)
 		{
-		int Crossovers = (int)(Pool.Length * Settings.CrossoverAmount);
 		int Columns = Pool[0].Row.Length;
+		int PoolCutoff = GetEugenicsIndex();
 		byte[] ColorA = new byte[Columns];
 		byte[] ColorB = new byte[Columns];
 		byte[] NewColorA = new byte[Columns];
@@ -260,14 +294,40 @@ namespace Mastermind
 
 			NewPoolIndex = Settings.ElitismCutoff;
 
+		float CrossoverAmount = Settings.CrossoverAmount;
+
+			//Tweak crossover rate to improve final convergence
+			if (Settings.DynamicCrossoverAmount)
+			{
+				CrossoverAmount = 0.6f;
+
+				//With high white, use a high crossover value
+				//With high red, use a low crossover value
+
+				int TippingPointRed = (int)Math.Floor(Columns * 0.8);
+				int TippingPointWhite = (int)Math.Floor(Columns * 0.7);
+
+				if (Board.Guesses[Board.Guesses.Count - 1].Score.NumCorrectSpot >= TippingPointRed)
+				{
+					int Diff = Columns - Board.Guesses[Board.Guesses.Count - 1].Score.NumCorrectSpot;
+					CrossoverAmount = (float)Diff / (float)Columns;
+				}
+				else if(Board.Guesses[Board.Guesses.Count - 1].Score.NumCorrectColor >= TippingPointWhite)
+				{
+					int Diff = Columns - Board.Guesses[Board.Guesses.Count - 1].Score.NumCorrectColor;
+					CrossoverAmount = 1.0f - (float)Diff / (float)Columns;
+				}
+			}
+
 			//Do Crossover members
-			for (int Cross = 0; Cross < Crossovers; Cross += 2, NewPoolIndex += 2)
+			for (int Cross = 0; Cross + 1 < (int)Math.Floor((Pool.Length - Settings.ElitismCutoff) * CrossoverAmount); 
+				Cross += 2, NewPoolIndex += 2)
 			{
 				//Linear crossover
 				if (Settings.LinearCrossover)
 				{
-					Pool[SelectParent()].Row.CopyTo(ColorA);
-					Pool[SelectParent()].Row.CopyTo(ColorB);
+					Pool[SelectParent(PoolCutoff)].Row.CopyTo(ColorA);
+					Pool[SelectParent(PoolCutoff)].Row.CopyTo(ColorB);
 					int Index = Generator.Next(Columns);
 
 					for (int i = 0; i < Index; i++)
@@ -284,12 +344,11 @@ namespace Mastermind
 
 					NewPool[NewPoolIndex].Row = new RowState(NewColorA);
 					NewPool[NewPoolIndex + 1].Row = new RowState(NewColorB);
-					
 				}
 				else //Random crossover
 				{
-					Pool[SelectParent()].Row.CopyTo(ShuffleColor, 0);
-					Pool[SelectParent()].Row.CopyTo(ShuffleColor, Columns);
+					Pool[SelectParent(PoolCutoff)].Row.CopyTo(ShuffleColor, 0);
+					Pool[SelectParent(PoolCutoff)].Row.CopyTo(ShuffleColor, Columns);
 
 					for (int i = 0; i < ShuffleColor.Length; i++)
 					{
@@ -307,16 +366,32 @@ namespace Mastermind
 				}
 			}
 
-			//Mutations
-			for(; NewPoolIndex < NewPool.Length; NewPoolIndex ++)
+			float MutationRate = Settings.MutationRate;
+
+			//Tweak the mutation rate to improve final convergence
+			if(Settings.DynamicMutationRate)
 			{
-				int Parent = SelectParent();
+				MutationRate = 0.25f;
+
+				int TippingPoint = (int)Math.Floor(Columns * 0.8); 
+
+				if(Board.Guesses[Board.Guesses.Count - 1].Score.NumCorrectSpot >= TippingPoint)
+				{
+					int Diff = Columns - Board.Guesses[Board.Guesses.Count - 1].Score.NumCorrectSpot;
+					MutationRate = (float)Diff / (float)Columns;
+				}
+			}
+
+			//Mutations
+			for (; NewPoolIndex < NewPool.Length; NewPoolIndex ++)
+			{
+				int Parent = SelectParent(PoolCutoff);
 				Pool[Parent].Row.CopyTo(NewColorA);
 
 				for(int i = 0; i < Selected.Length; i ++)
 					Selected[i] = false;
 
-				for(int i = 0; i < (int)Math.Round(Columns * Settings.MutationRate); i ++)
+				for (int i = 0; i < Math.Max((int)Math.Round(Columns * MutationRate), 1); i ++)
 				{
 					int Column = 0;
 
@@ -369,8 +444,17 @@ namespace Mastermind
 
 		int AveragePoolScore = (int)(PoolScore / Pool.Length);
 
-			Status = string.Format("Best Score: {0}, Average Score: {2}, Generations: {1}", 
-				Guess.Score, Generations, AveragePoolScore);
+			PoolScore = 0;
+
+			for (int i = 0; i < Settings.ElitismCutoff; i++)
+			{
+				PoolScore += Pool[i].Score;
+			}
+
+		int ElitePoolScore = (int)(PoolScore / Settings.ElitismCutoff);
+
+			Status = string.Format("Best: {0}, Elite: {1}, Pool: {2}, Generations: {3}", 
+				Guess.Score, ElitePoolScore, AveragePoolScore, Generations);
 
 			return Guess.Row;
 		}

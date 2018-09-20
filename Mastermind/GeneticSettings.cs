@@ -96,10 +96,26 @@ namespace Mastermind
 				e.Cancel = true;
 		}
 
+		private void CutoffTextBox_Validating(object sender, CancelEventArgs e)
+		{
+			if (!ValidateAll())
+				e.Cancel = true;
+		}
+
 		private void GenerationsTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
+		}
+
+		private void DynCrossoversCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			CrossoversTextBox.Enabled = !DynCrossoversCheckBox.Checked;
+		}
+
+		private void DynMutationsCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			MutationTextBox.Enabled = !DynMutationsCheckBox.Checked;
 		}
 
 		private void OKButton_Click(object sender, EventArgs e)
@@ -114,10 +130,13 @@ namespace Mastermind
 
 			PoolSizeTextBox.Text = Settings.PoolSize.ToString();
 			CrossoversTextBox.Text = Settings.CrossoverAmount.ToString();
+			DynCrossoversCheckBox.Checked = Settings.DynamicCrossoverAmount;
 			MutationTextBox.Text = Settings.MutationRate.ToString();
+			DynMutationsCheckBox.Checked = Settings.DynamicMutationRate;
 			ElitismTextBox.Text = Settings.ElitismCutoff.ToString();
 			MatchTextBox.Text = Settings.MatchScore.ToString();
 			PartialTextBox.Text = Settings.PartialMatchScore.ToString();
+			CutoffTextBox.Text = Settings.ScoreCutoff.ToString();
 			GenerationsTextBox.Text = Settings.MaxGenerations.ToString();
 			LinearCheckBox.Checked = Settings.LinearCrossover;
 		}
@@ -142,6 +161,9 @@ namespace Mastermind
 			if (!ValidateBox<Int32>(PartialTextBox, 0, Int32.MaxValue))
 				return false;
 
+			if (!ValidateBox<Int32>(CutoffTextBox, Int32.MinValue, 0))
+				return false;
+
 			if (!ValidateBox<Int32>(GenerationsTextBox, 0, Int32.MaxValue))
 				return false;
 
@@ -160,13 +182,18 @@ namespace Mastermind
 
 				Settings.PoolSize = int.Parse(PoolSizeTextBox.Text);
 				Settings.CrossoverAmount = float.Parse(CrossoversTextBox.Text);
+				Settings.DynamicCrossoverAmount = DynCrossoversCheckBox.Checked;
 				Settings.MutationRate = float.Parse(MutationTextBox.Text);
+				Settings.DynamicMutationRate = DynMutationsCheckBox.Checked;
 				Settings.ElitismCutoff = int.Parse(ElitismTextBox.Text);
 				Settings.MatchScore = int.Parse(MatchTextBox.Text);
 				Settings.PartialMatchScore = int.Parse(PartialTextBox.Text);
+				Settings.ScoreCutoff = int.Parse(CutoffTextBox.Text);
 				Settings.MaxGenerations = int.Parse(GenerationsTextBox.Text);
 				Settings.LinearCrossover = LinearCheckBox.Checked;
 			}
 		}
+
+		
 	}
 }
