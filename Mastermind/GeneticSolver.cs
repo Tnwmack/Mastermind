@@ -56,14 +56,14 @@ namespace Mastermind
 			/// <see cref="ICloneable.Clone"/>
 			public object Clone()
 			{
-                return new GeneticSolverSettings
-                {
-                    PoolSize = PoolSize,
-                    CrossoverAmount = CrossoverAmount,
-                    MutationRate = MutationRate,
-                    ElitismCutoff = ElitismCutoff,
-                    MatchScore = MatchScore,
-                    PartialMatchScore = PartialMatchScore,
+				return new GeneticSolverSettings
+				{
+					PoolSize = PoolSize,
+					CrossoverAmount = CrossoverAmount,
+					MutationRate = MutationRate,
+					ElitismCutoff = ElitismCutoff,
+					MatchScore = MatchScore,
+					PartialMatchScore = PartialMatchScore,
 					MaxGenerations = MaxGenerations
 				};
 			}
@@ -86,8 +86,6 @@ namespace Mastermind
 		//SortedSet<PoolMember> sorted = new SortedSet<PoolMember>();
 
 		private PoolMember[] Pool;
-		private float[] CDF;
-		private List<int>[] IndexBuckets;
 		private int Generations = 0;
 
 		public GeneticSolver()
@@ -109,39 +107,6 @@ namespace Mastermind
 				NewMember.Row = RowState.GetRandomColors(Generator, Board.NumColors, Board.NumColumns);
 				Pool[i] = NewMember;
 			}
-
-
-			//P(x) = -1*x + 1
-			//CDF(X) = (1/2)x^2
-
-			//Generate the Cumulative Distribution Function from the probability function
-		//float PSum = 1.0f;
-			
-			CDF = new float[Settings.PoolSize - Settings.ElitismCutoff];
-
-			for (int i = 0; i < CDF.Length; i ++)
-			{
-				//CDF[i] = 0.4999f - ( 0.5f * (float)Math.Pow((float)i / (float)CDF.Length, 2));
-				CDF[i] = 0.5f * (float)Math.Pow( 1.0f - ((float)i / (float)CDF.Length), 2);
-			}
-
-			//Bucket the CDF for faster lookup
-			IndexBuckets = new List<int>[CDF.Length / 25];
-
-			for(int i = 0; i < IndexBuckets.Length; i ++)
-			{
-				IndexBuckets[i] = new List<int>();
-			}
-
-			for(int i = 0; i < CDF.Length; i ++)
-			{
-			int Bucket = (int)(CDF[i] / (0.5f / (float)IndexBuckets.Length));
-				
-				if (Bucket == IndexBuckets.Length)
-					Bucket--;
-
-				IndexBuckets[Bucket].Add(i);
-			}
 		}
 
 		/// <summary>
@@ -153,8 +118,8 @@ namespace Mastermind
 		private int CompareRows(RowState Row, BoardRow PlayedRow)
 		{
 		bool[] RowMatched = new bool[Row.Length];
-        bool[] GuessMatched = new bool[Row.Length];
-        int SamePosAndColor = 0, SameColor = 0;
+		bool[] GuessMatched = new bool[Row.Length];
+		int SamePosAndColor = 0, SameColor = 0;
 		int Score = 0;
 
 			for (int i = 0; i < Row.Length; i++)
@@ -162,8 +127,8 @@ namespace Mastermind
 				if (Row[i] == PlayedRow.Row[i])
 				{
 					SamePosAndColor++;
-                    RowMatched[i] = GuessMatched[i] = true;
-                }
+					RowMatched[i] = GuessMatched[i] = true;
+				}
 			}
 
 		int MatchDifference = Math.Abs(PlayedRow.Score.NumCorrectSpot - SamePosAndColor);
@@ -232,25 +197,18 @@ namespace Mastermind
 		/// Selects a suitable parent for crossover operations
 		/// </summary>
 		/// <returns>A parent index to use</returns>
-		private int SelectParent(float WeightSum)
+		private int SelectParent()
 		{
-		float Rand = (float)Generator.NextDouble() * WeightSum;
-		int Bucket = (int)(Rand / (WeightSum / (float)IndexBuckets.Length));
+			//P(x) = -1*x + 1
+			//CDF(X) = -(1/2)x^2 + x
+			//X = 1 - (1 - 2*y)^(1/2)
+			float y = (float)Generator.NextDouble() * 0.5f;
+			float x = 1.0f - (float)Math.Sqrt(1.0f - 2.0f * y);
+			x *= Pool.Length - Settings.ElitismCutoff;
+			x = (float)Math.Floor(x);
+			int index = (int)x;
 
-			if (Bucket == IndexBuckets.Length)
-				Bucket--;
-
-		List<int> PoolBucket = IndexBuckets[Bucket];
-
-			for(int i = 0; i < PoolBucket.Count - 1; i ++)
-			{
-				if((Rand > CDF[PoolBucket[i + 1]]) && (Rand <= CDF[PoolBucket[i]]))
-				{
-					return PoolBucket[i] + Settings.ElitismCutoff;
-				}
-			}
-
-			return PoolBucket[PoolBucket.Count - 1];
+			return index + Settings.ElitismCutoff;
 		}
 
 		/// <summary>
@@ -304,8 +262,8 @@ namespace Mastermind
 			//Do Crossover members
 			for (int Cross = 0; Cross < Crossovers / 2; Cross += 2, NewPoolIndex += 2)
 			{
-			int IndexA = SelectParent(0.5f);
-			int IndexB = SelectParent(0.5f);
+			int IndexA = SelectParent();
+			int IndexB = SelectParent();
 
 				Pool[IndexA].Row.CopyTo(ColorA);
 				Pool[IndexB].Row.CopyTo(ColorB);
@@ -349,7 +307,7 @@ namespace Mastermind
 			//Mutations
 			for(; NewPoolIndex < NewPool.Length; NewPoolIndex ++)
 			{
-				int Parent = SelectParent(0.5f);
+				int Parent = SelectParent();
 				Pool[Parent].Row.CopyTo(NewColorA);
 
 				bool[] Selected = new bool[Columns];
@@ -388,25 +346,16 @@ namespace Mastermind
 			//Perform pool evolution
 			Evolve(Board);
 
+		System.Collections.IEnumerator PoolEnum = Pool.GetEnumerator();
 		PoolMember Guess = new PoolMember();
 
 			//Skip guesses that have already been made
-			for (int s = 0; s < Pool.Length; s ++)
+			do
 			{
-			int i = 0;
-
-				for (i = 0; i < Board.Guesses.Count; i++)
-				{
-					if (Board.Guesses[i].Row == Pool[s].Row)
-						break;
-				}
-
-				if(i == Board.Guesses.Count)
-				{
-					Guess = Pool[s];
-					break;
-				}
+				if (!PoolEnum.MoveNext()) break;
+				Guess = (PoolMember)PoolEnum.Current;
 			}
+			while (Board.Guesses.Exists(m => m.Row == Guess.Row));
 
 			Status = string.Format("Best Score: {0}, Generations: {1}", 
 				Guess.Score, Generations);

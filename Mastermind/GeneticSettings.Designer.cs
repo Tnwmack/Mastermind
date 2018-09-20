@@ -89,8 +89,9 @@
 			// 
 			// CrossoversTextBox
 			// 
-			this.helpProvider1.SetHelpString(this.CrossoversTextBox, "The ratio of crossovers that take place. Eg: 0.5 = 0.5*poolsize crossovers will b" +
-        "e performed. Default: 0.7");
+			this.helpProvider1.SetHelpString(this.CrossoversTextBox, "The ratio of crossovers that take place, the remainder will be mutations. Eg: 0.5" +
+        " = 0.5*poolsize crossovers and 0.5*poolsize mutations will be performed. Default" +
+        ": 0.7");
 			this.CrossoversTextBox.Location = new System.Drawing.Point(100, 38);
 			this.CrossoversTextBox.Name = "CrossoversTextBox";
 			this.helpProvider1.SetShowHelp(this.CrossoversTextBox, true);

@@ -35,5 +35,42 @@ namespace Mastermind.Tests
 			RowState CheckRow3 = new RowState(1, 1, 2, 3);
 			Assert.AreEqual(-Settings.PartialMatchScore, (int)GSpriv.Invoke("CompareRows", CheckRow3, Guess2));
 		}
-    }
+
+		[TestMethod()]
+		public void SelectParentTest()
+		{
+			GeneticSolver.GeneticSolverSettings Settings = new GeneticSolver.GeneticSolverSettings();
+			GeneticSolver GS = new GeneticSolver();
+			PrivateObject GSpriv = new PrivateObject(GS);
+			GameBoard GB = new GameBoard(5, 4, 10, new RowState(new byte[] { 0, 1, 2, 3 }));
+			GS.GeneratePool(GB);
+
+			Console.WriteLine("\r\nTest counts:");
+
+			int[] SelectCounts = new int[(Settings.PoolSize - Settings.ElitismCutoff) / 10];
+
+			for(int i = 0; i < Settings.PoolSize * 1000; i ++)
+			{
+				int index = (int)GSpriv.Invoke("SelectParent");
+				Assert.IsTrue(index >= Settings.ElitismCutoff);
+				Assert.IsTrue(index < Settings.PoolSize);
+				index -= Settings.ElitismCutoff;
+				SelectCounts[index / 10]++;
+			}
+
+			for(int i = 0; i < (Settings.PoolSize - Settings.ElitismCutoff) / 10; i ++)
+			{
+				Console.Write((i * 10).ToString() + ",");
+			}
+
+			Console.Write("\r\n");
+
+			for (int i = 0; i < (Settings.PoolSize - Settings.ElitismCutoff) / 10; i++)
+			{
+				Console.Write(SelectCounts[i] + ",");
+			}
+
+			Console.Write("\r\n");
+		}
+	}
 }
