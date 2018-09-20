@@ -45,15 +45,16 @@
 			this.helpProvider1 = new System.Windows.Forms.HelpProvider();
 			this.GenerationsTextBox = new System.Windows.Forms.TextBox();
 			this.label7 = new System.Windows.Forms.Label();
+			this.LinearCheckBox = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// OKButton
 			// 
 			this.OKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-			this.OKButton.Location = new System.Drawing.Point(12, 194);
+			this.OKButton.Location = new System.Drawing.Point(12, 217);
 			this.OKButton.Name = "OKButton";
 			this.OKButton.Size = new System.Drawing.Size(75, 23);
-			this.OKButton.TabIndex = 7;
+			this.OKButton.TabIndex = 8;
 			this.OKButton.Text = "OK";
 			this.OKButton.UseVisualStyleBackColor = true;
 			this.OKButton.Click += new System.EventHandler(this.OKButton_Click);
@@ -61,10 +62,10 @@
 			// CanButton
 			// 
 			this.CanButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.CanButton.Location = new System.Drawing.Point(93, 194);
+			this.CanButton.Location = new System.Drawing.Point(93, 217);
 			this.CanButton.Name = "CanButton";
 			this.CanButton.Size = new System.Drawing.Size(75, 23);
-			this.CanButton.TabIndex = 8;
+			this.CanButton.TabIndex = 9;
 			this.CanButton.Text = "Cancel";
 			this.CanButton.UseVisualStyleBackColor = true;
 			// 
@@ -193,6 +194,7 @@
 			this.helpProvider1.SetShowHelp(this.GenerationsTextBox, true);
 			this.GenerationsTextBox.Size = new System.Drawing.Size(100, 20);
 			this.GenerationsTextBox.TabIndex = 6;
+			this.GenerationsTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.GenerationsTextBox_Validating);
 			// 
 			// label7
 			// 
@@ -203,13 +205,26 @@
 			this.label7.TabIndex = 14;
 			this.label7.Text = "Max Generations:";
 			// 
+			// LinearCheckBox
+			// 
+			this.LinearCheckBox.AutoSize = true;
+			this.helpProvider1.SetHelpString(this.LinearCheckBox, "Checked to use linear crossovers, random crossovers otherwise. Default: Linear");
+			this.LinearCheckBox.Location = new System.Drawing.Point(7, 194);
+			this.LinearCheckBox.Name = "LinearCheckBox";
+			this.helpProvider1.SetShowHelp(this.LinearCheckBox, true);
+			this.LinearCheckBox.Size = new System.Drawing.Size(132, 17);
+			this.LinearCheckBox.TabIndex = 7;
+			this.LinearCheckBox.Text = "Use Linear Crossovers";
+			this.LinearCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// GeneticSettings
 			// 
 			this.AcceptButton = this.OKButton;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.CanButton;
-			this.ClientSize = new System.Drawing.Size(212, 230);
+			this.ClientSize = new System.Drawing.Size(212, 251);
+			this.Controls.Add(this.LinearCheckBox);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.GenerationsTextBox);
 			this.Controls.Add(this.PartialTextBox);
@@ -258,5 +273,6 @@
 		private System.Windows.Forms.HelpProvider helpProvider1;
 		private System.Windows.Forms.TextBox GenerationsTextBox;
 		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.CheckBox LinearCheckBox;
 	}
 }

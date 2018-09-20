@@ -47,25 +47,24 @@ namespace Mastermind.Tests
 
 			Console.WriteLine("\r\nTest counts:");
 
-			int[] SelectCounts = new int[(Settings.PoolSize - Settings.ElitismCutoff) / 10];
+			int[] SelectCounts = new int[Settings.PoolSize / 10];
 
 			for(int i = 0; i < Settings.PoolSize * 1000; i ++)
 			{
 				int index = (int)GSpriv.Invoke("SelectParent");
-				Assert.IsTrue(index >= Settings.ElitismCutoff);
+				Assert.IsTrue(index >= 0);
 				Assert.IsTrue(index < Settings.PoolSize);
-				index -= Settings.ElitismCutoff;
 				SelectCounts[index / 10]++;
 			}
 
-			for(int i = 0; i < (Settings.PoolSize - Settings.ElitismCutoff) / 10; i ++)
+			for(int i = 0; i < Settings.PoolSize / 10; i ++)
 			{
 				Console.Write((i * 10).ToString() + ",");
 			}
 
 			Console.Write("\r\n");
 
-			for (int i = 0; i < (Settings.PoolSize - Settings.ElitismCutoff) / 10; i++)
+			for (int i = 0; i < Settings.PoolSize / 10; i++)
 			{
 				Console.Write(SelectCounts[i] + ",");
 			}
