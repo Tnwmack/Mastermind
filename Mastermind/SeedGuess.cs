@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 
 namespace Mastermind
 {
+	/// <summary>
+	/// Generates generic seed guesses.
+	/// </summary>
 	class SeedGuess
 	{
-		public static RowState GetGuess(GameBoard Board, byte Index)
+		/// <summary>
+		/// Get a seed guess using a modified Knuth system.
+		/// </summary>
+		/// <param name="Board">The board in use.</param>
+		/// <returns>A random guess.</returns>
+		public static RowState GetGuess(GameBoard Board)
 		{
-		//This guess pattern is recommended by Knuth
+		byte Index = (byte)Board.Guesses.Count;
 		byte[] Guess = new byte[Board.NumColumns];
 		int Split = Board.NumColumns / 2;
 

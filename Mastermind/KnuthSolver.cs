@@ -330,7 +330,7 @@ namespace Mastermind
 		{
 			//Use a seed guess
 			if (Board.Guesses.Count < 2 || (Board.Guesses.Count == 2 && Board.NumColumns > 6 && Board.NumColors > 5))
-				return SeedGuess.GetGuess(Board, (byte)Board.Guesses.Count);
+				return SeedGuess.GetGuess(Board);
 
 			if (Pool == null)
 			{
