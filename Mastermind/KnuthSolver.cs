@@ -86,7 +86,7 @@ namespace Mastermind
 					FillThreads[i].Start();
 				}
 
-				//Wait for each thead to finish
+				//Wait for each thread to finish
 				for (int i = 0; i < FillThreads.Length; i++)
 				{
 					FillThreads[i].Join();
@@ -235,8 +235,8 @@ namespace Mastermind
 		{
 		int SamePosAndColor = 0, SameColor = 0;
 
-			if (Colors == Board.Answer)
-				System.Diagnostics.Debugger.Break();
+			//if (Colors == Board.Answer)
+			//	System.Diagnostics.Debugger.Break();
 
 			//Optimization, counting backwards is supposedly faster since a NZ test is faster than a less than
 			for (int i = Colors.Length - 1; i >= 0; i--)
@@ -328,18 +328,9 @@ namespace Mastermind
 		/// <see cref="Solver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
 		{
-			//TODO: Add seprate module for seed guesses
-			if(Board.Guesses.Count == 0)
-			{
-			//This guess pattern is recommended by Knuth
-			byte[] Guess = new byte[Board.NumColumns];
-			int Split = Board.NumColumns / 2;
-
-				for (int i = Split; i < Board.NumColumns; i++)
-					Guess[i] = 1;
-
-				return new RowState(Guess);
-			}
+			//Use a seed guess
+			if (Board.Guesses.Count < 2 || (Board.Guesses.Count == 2 && Board.NumColumns > 6 && Board.NumColors > 5))
+				return SeedGuess.GetGuess(Board);
 
 			if (Pool == null)
 			{

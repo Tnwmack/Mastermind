@@ -54,7 +54,17 @@ namespace Mastermind
 		{
 			Colors.CopyTo(Dest, 0);
 		}
-		
+
+		/// <summary>
+		/// Copies the row colors to a byte array
+		/// </summary>
+		/// <param name="Dest">The destination array</param>
+		/// <param name="StartIndex">The index in Dest to start copying to</param>
+		public void CopyTo(byte[] Dest, int StartIndex)
+		{
+			Colors.CopyTo(Dest, StartIndex);
+		}
+
 		/// <summary>
 		/// Converts this row to a string of numbers
 		/// </summary>

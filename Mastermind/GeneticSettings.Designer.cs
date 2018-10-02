@@ -42,17 +42,23 @@
 			this.label5 = new System.Windows.Forms.Label();
 			this.PartialTextBox = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
-			this.UnionCheckBox = new System.Windows.Forms.CheckBox();
 			this.helpProvider1 = new System.Windows.Forms.HelpProvider();
+			this.GenerationsTextBox = new System.Windows.Forms.TextBox();
+			this.LinearCheckBox = new System.Windows.Forms.CheckBox();
+			this.CutoffTextBox = new System.Windows.Forms.TextBox();
+			this.label7 = new System.Windows.Forms.Label();
+			this.DynCrossoversCheckBox = new System.Windows.Forms.CheckBox();
+			this.DynMutationsCheckBox = new System.Windows.Forms.CheckBox();
+			this.label8 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// OKButton
 			// 
 			this.OKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-			this.OKButton.Location = new System.Drawing.Point(12, 191);
+			this.OKButton.Location = new System.Drawing.Point(12, 289);
 			this.OKButton.Name = "OKButton";
 			this.OKButton.Size = new System.Drawing.Size(75, 23);
-			this.OKButton.TabIndex = 7;
+			this.OKButton.TabIndex = 11;
 			this.OKButton.Text = "OK";
 			this.OKButton.UseVisualStyleBackColor = true;
 			this.OKButton.Click += new System.EventHandler(this.OKButton_Click);
@@ -60,17 +66,17 @@
 			// CanButton
 			// 
 			this.CanButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.CanButton.Location = new System.Drawing.Point(93, 191);
+			this.CanButton.Location = new System.Drawing.Point(93, 289);
 			this.CanButton.Name = "CanButton";
 			this.CanButton.Size = new System.Drawing.Size(75, 23);
-			this.CanButton.TabIndex = 8;
+			this.CanButton.TabIndex = 12;
 			this.CanButton.Text = "Cancel";
 			this.CanButton.UseVisualStyleBackColor = true;
 			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(33, 15);
+			this.label1.Location = new System.Drawing.Point(40, 15);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(54, 13);
 			this.label1.TabIndex = 2;
@@ -79,7 +85,7 @@
 			// PoolSizeTextBox
 			// 
 			this.helpProvider1.SetHelpString(this.PoolSizeTextBox, "The size of the pool. Default: 500");
-			this.PoolSizeTextBox.Location = new System.Drawing.Point(93, 12);
+			this.PoolSizeTextBox.Location = new System.Drawing.Point(100, 12);
 			this.PoolSizeTextBox.Name = "PoolSizeTextBox";
 			this.helpProvider1.SetShowHelp(this.PoolSizeTextBox, true);
 			this.PoolSizeTextBox.Size = new System.Drawing.Size(100, 20);
@@ -88,9 +94,10 @@
 			// 
 			// CrossoversTextBox
 			// 
-			this.helpProvider1.SetHelpString(this.CrossoversTextBox, "The ratio of crossovers that take place. Eg: 0.5 = 0.5*poolsize crossovers will b" +
-        "e performed. Default: 0.7");
-			this.CrossoversTextBox.Location = new System.Drawing.Point(93, 38);
+			this.helpProvider1.SetHelpString(this.CrossoversTextBox, "The ratio of crossovers that take place, the remainder will be mutations. Eg: 0.5" +
+        " = 0.5*poolsize crossovers and 0.5*poolsize mutations will be performed. Default" +
+        ": 0.7");
+			this.CrossoversTextBox.Location = new System.Drawing.Point(100, 38);
 			this.CrossoversTextBox.Name = "CrossoversTextBox";
 			this.helpProvider1.SetShowHelp(this.CrossoversTextBox, true);
 			this.CrossoversTextBox.Size = new System.Drawing.Size(100, 20);
@@ -100,7 +107,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(25, 41);
+			this.label2.Location = new System.Drawing.Point(32, 41);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(62, 13);
 			this.label2.TabIndex = 4;
@@ -108,18 +115,18 @@
 			// 
 			// MutationTextBox
 			// 
-			this.helpProvider1.SetHelpString(this.MutationTextBox, "The rate of color mutations when a crossover is performed. Default: 0.1");
-			this.MutationTextBox.Location = new System.Drawing.Point(93, 64);
+			this.helpProvider1.SetHelpString(this.MutationTextBox, "The number of columns mutated after a parent is selected. Default: 0.25");
+			this.MutationTextBox.Location = new System.Drawing.Point(100, 87);
 			this.MutationTextBox.Name = "MutationTextBox";
 			this.helpProvider1.SetShowHelp(this.MutationTextBox, true);
 			this.MutationTextBox.Size = new System.Drawing.Size(100, 20);
-			this.MutationTextBox.TabIndex = 2;
+			this.MutationTextBox.TabIndex = 3;
 			this.MutationTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.MutationTextBox_Validating);
 			// 
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(10, 67);
+			this.label3.Location = new System.Drawing.Point(17, 90);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(77, 13);
 			this.label3.TabIndex = 6;
@@ -128,17 +135,17 @@
 			// ElitismTextBox
 			// 
 			this.helpProvider1.SetHelpString(this.ElitismTextBox, "This many of the top pool members will not be crossed or mutated. Default: 20");
-			this.ElitismTextBox.Location = new System.Drawing.Point(93, 90);
+			this.ElitismTextBox.Location = new System.Drawing.Point(100, 136);
 			this.ElitismTextBox.Name = "ElitismTextBox";
 			this.helpProvider1.SetShowHelp(this.ElitismTextBox, true);
 			this.ElitismTextBox.Size = new System.Drawing.Size(100, 20);
-			this.ElitismTextBox.TabIndex = 3;
+			this.ElitismTextBox.TabIndex = 5;
 			this.ElitismTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.ElitismTextBox_Validating);
 			// 
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(17, 93);
+			this.label4.Location = new System.Drawing.Point(24, 139);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(70, 13);
 			this.label4.TabIndex = 8;
@@ -147,17 +154,17 @@
 			// MatchTextBox
 			// 
 			this.helpProvider1.SetHelpString(this.MatchTextBox, "The score weight of matching color and column in evaluation. Default: 50");
-			this.MatchTextBox.Location = new System.Drawing.Point(93, 116);
+			this.MatchTextBox.Location = new System.Drawing.Point(100, 162);
 			this.MatchTextBox.Name = "MatchTextBox";
 			this.helpProvider1.SetShowHelp(this.MatchTextBox, true);
 			this.MatchTextBox.Size = new System.Drawing.Size(100, 20);
-			this.MatchTextBox.TabIndex = 4;
+			this.MatchTextBox.TabIndex = 6;
 			this.MatchTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.MatchTextBox_Validating);
 			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(16, 119);
+			this.label5.Location = new System.Drawing.Point(23, 165);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(71, 13);
 			this.label5.TabIndex = 10;
@@ -166,33 +173,98 @@
 			// PartialTextBox
 			// 
 			this.helpProvider1.SetHelpString(this.PartialTextBox, "The score weight of matching color but not column in evaluation. Default: 20");
-			this.PartialTextBox.Location = new System.Drawing.Point(93, 142);
+			this.PartialTextBox.Location = new System.Drawing.Point(100, 188);
 			this.PartialTextBox.Name = "PartialTextBox";
 			this.helpProvider1.SetShowHelp(this.PartialTextBox, true);
 			this.PartialTextBox.Size = new System.Drawing.Size(100, 20);
-			this.PartialTextBox.TabIndex = 5;
+			this.PartialTextBox.TabIndex = 7;
 			this.PartialTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.PartialTextBox_Validating);
 			// 
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(17, 145);
+			this.label6.Location = new System.Drawing.Point(24, 191);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(70, 13);
 			this.label6.TabIndex = 12;
 			this.label6.Text = "Partial Score:";
 			// 
-			// UnionCheckBox
+			// GenerationsTextBox
 			// 
-			this.UnionCheckBox.AutoSize = true;
-			this.helpProvider1.SetHelpString(this.UnionCheckBox, "If on, child genes will be mixed, if off they will be split. Default: off");
-			this.UnionCheckBox.Location = new System.Drawing.Point(67, 168);
-			this.UnionCheckBox.Name = "UnionCheckBox";
-			this.helpProvider1.SetShowHelp(this.UnionCheckBox, true);
-			this.UnionCheckBox.Size = new System.Drawing.Size(126, 17);
-			this.UnionCheckBox.TabIndex = 6;
-			this.UnionCheckBox.Text = "Use Union Crossover";
-			this.UnionCheckBox.UseVisualStyleBackColor = true;
+			this.helpProvider1.SetHelpString(this.GenerationsTextBox, "The maximum number of times to evolve the pool before giving up and guessing. Def" +
+        "ault: 200");
+			this.GenerationsTextBox.Location = new System.Drawing.Point(100, 240);
+			this.GenerationsTextBox.Name = "GenerationsTextBox";
+			this.helpProvider1.SetShowHelp(this.GenerationsTextBox, true);
+			this.GenerationsTextBox.Size = new System.Drawing.Size(100, 20);
+			this.GenerationsTextBox.TabIndex = 9;
+			this.GenerationsTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.GenerationsTextBox_Validating);
+			// 
+			// LinearCheckBox
+			// 
+			this.LinearCheckBox.AutoSize = true;
+			this.helpProvider1.SetHelpString(this.LinearCheckBox, "If checked. use linear crossovers, random crossovers otherwise. Default: on");
+			this.LinearCheckBox.Location = new System.Drawing.Point(68, 266);
+			this.LinearCheckBox.Name = "LinearCheckBox";
+			this.helpProvider1.SetShowHelp(this.LinearCheckBox, true);
+			this.LinearCheckBox.Size = new System.Drawing.Size(132, 17);
+			this.LinearCheckBox.TabIndex = 10;
+			this.LinearCheckBox.Text = "Use Linear Crossovers";
+			this.LinearCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// CutoffTextBox
+			// 
+			this.helpProvider1.SetHelpString(this.CutoffTextBox, "Remove pool members with a score below this value, 0 to disable. Default: -500");
+			this.CutoffTextBox.Location = new System.Drawing.Point(100, 214);
+			this.CutoffTextBox.Name = "CutoffTextBox";
+			this.helpProvider1.SetShowHelp(this.CutoffTextBox, true);
+			this.CutoffTextBox.Size = new System.Drawing.Size(100, 20);
+			this.CutoffTextBox.TabIndex = 8;
+			this.CutoffTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.CutoffTextBox_Validating);
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(4, 243);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(90, 13);
+			this.label7.TabIndex = 14;
+			this.label7.Text = "Max Generations:";
+			// 
+			// DynCrossoversCheckBox
+			// 
+			this.DynCrossoversCheckBox.AutoSize = true;
+			this.helpProvider1.SetHelpString(this.DynCrossoversCheckBox, "If checked, the crossovers ratio will be determined dynamically. Default: off");
+			this.DynCrossoversCheckBox.Location = new System.Drawing.Point(78, 64);
+			this.DynCrossoversCheckBox.Name = "DynCrossoversCheckBox";
+			this.helpProvider1.SetShowHelp(this.DynCrossoversCheckBox, true);
+			this.DynCrossoversCheckBox.Size = new System.Drawing.Size(122, 17);
+			this.DynCrossoversCheckBox.TabIndex = 2;
+			this.DynCrossoversCheckBox.Text = "Dynamic Crossovers";
+			this.DynCrossoversCheckBox.UseVisualStyleBackColor = true;
+			this.DynCrossoversCheckBox.CheckedChanged += new System.EventHandler(this.DynCrossoversCheckBox_CheckedChanged);
+			// 
+			// DynMutationsCheckBox
+			// 
+			this.DynMutationsCheckBox.AutoSize = true;
+			this.helpProvider1.SetHelpString(this.DynMutationsCheckBox, "If checked, the mutation rate will be determined dynamically. Default: on");
+			this.DynMutationsCheckBox.Location = new System.Drawing.Point(84, 113);
+			this.DynMutationsCheckBox.Name = "DynMutationsCheckBox";
+			this.helpProvider1.SetShowHelp(this.DynMutationsCheckBox, true);
+			this.DynMutationsCheckBox.Size = new System.Drawing.Size(116, 17);
+			this.DynMutationsCheckBox.TabIndex = 4;
+			this.DynMutationsCheckBox.Text = "Dynamic Mutations";
+			this.DynMutationsCheckBox.UseVisualStyleBackColor = true;
+			this.DynMutationsCheckBox.CheckedChanged += new System.EventHandler(this.DynMutationsCheckBox_CheckedChanged);
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(25, 217);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(69, 13);
+			this.label8.TabIndex = 16;
+			this.label8.Text = "Cutoff Score:";
 			// 
 			// GeneticSettings
 			// 
@@ -200,8 +272,14 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.CanButton;
-			this.ClientSize = new System.Drawing.Size(206, 226);
-			this.Controls.Add(this.UnionCheckBox);
+			this.ClientSize = new System.Drawing.Size(212, 323);
+			this.Controls.Add(this.label8);
+			this.Controls.Add(this.CutoffTextBox);
+			this.Controls.Add(this.DynMutationsCheckBox);
+			this.Controls.Add(this.DynCrossoversCheckBox);
+			this.Controls.Add(this.LinearCheckBox);
+			this.Controls.Add(this.label7);
+			this.Controls.Add(this.GenerationsTextBox);
 			this.Controls.Add(this.PartialTextBox);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.MatchTextBox);
@@ -245,7 +323,13 @@
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox PartialTextBox;
 		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.CheckBox UnionCheckBox;
 		private System.Windows.Forms.HelpProvider helpProvider1;
+		private System.Windows.Forms.TextBox GenerationsTextBox;
+		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.CheckBox LinearCheckBox;
+		private System.Windows.Forms.CheckBox DynCrossoversCheckBox;
+		private System.Windows.Forms.CheckBox DynMutationsCheckBox;
+		private System.Windows.Forms.TextBox CutoffTextBox;
+		private System.Windows.Forms.Label label8;
 	}
 }
