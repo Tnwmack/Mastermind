@@ -19,27 +19,26 @@ namespace Mastermind
 			InitializeComponent();
 		}
 
-		private bool ValidateBox<T>(TextBox Box, T Min, T Max)
+		private bool ValidateBox<T>(TextBox Box, T Min, T Max) where T : IComparable<T>
 		{
 			if (String.IsNullOrEmpty(Box.Text))
 				return false;
 
+			//Try parsing the box to the requested type
 		Type[] ArgTypes = { typeof(string), typeof(T).MakeByRefType() };
-		var TryParseMethod = typeof(T).GetMethod("TryParse", ArgTypes);
+		System.Reflection.MethodInfo TryParseMethod = typeof(T).GetMethod("TryParse", ArgTypes);
 
 			if (TryParseMethod == null)
-				return false;
+				throw new ArgumentException("No TryParse method defined for type");
 
 		object[] args = { Box.Text, null };
 		bool Parsed = (bool)TryParseMethod.Invoke(null, args);
 
-		Type[] ArgTypes2 = { typeof(T) };
-		var CompareToMethod = typeof(T).GetMethod("CompareTo", ArgTypes2);
-
-			if (CompareToMethod != null)
+			//Compare the result to the bounds
+			if (Parsed)
 			{
-				int MinResult = (int)CompareToMethod.Invoke(args[1], new object[] { Min });
-				int MaxResult = (int)CompareToMethod.Invoke(args[1], new object[] { Max });
+			int MinResult = ((T)args[1]).CompareTo(Min);
+			int MaxResult = ((T)args[1]).CompareTo(Max);
 
 				if (MaxResult > 0)
 					Parsed = false;
@@ -47,7 +46,7 @@ namespace Mastermind
 				if (MinResult < 0)
 					Parsed = false;
 			}
-
+			
 			if (Parsed)
 			{
 				Box.BackColor = Color.White;
@@ -120,7 +119,7 @@ namespace Mastermind
 
 		private void OKButton_Click(object sender, EventArgs e)
 		{
-			ValidateAll();
+			//ValidateAll();
 		}
 
 		private void GeneticSettings_Load(object sender, EventArgs e)

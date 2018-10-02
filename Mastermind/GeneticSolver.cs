@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 
 namespace Mastermind
 {
+	/// <summary>
+	/// A Mastermind solver that uses genetic algorithms.
+	/// </summary>
 	public class GeneticSolver : Solver
 	{
 		private Random Generator = new Random();
 
+		/// <summary>
+		/// The current status to send to the GUI.
+		/// </summary>
 		private string Status = "";
 
 		/// <summary>
@@ -23,12 +29,13 @@ namespace Mastermind
 			public int PoolSize = 500;
 
 			/// <summary>
-			/// The number of crossovers to perform (pool*CrossoverAmount)
+			/// The number of crossovers to perform (pool*CrossoverAmount), 
+			/// remainder are elites and mutations
 			/// </summary>
 			public float CrossoverAmount = 0.7f;
 
 			/// <summary>
-			/// The rate that colors are mutated during a crossover
+			/// The rate that colors are mutated (columns*MutationRate) mutations
 			/// </summary>
 			public float MutationRate = 0.25f;
 
@@ -44,7 +51,7 @@ namespace Mastermind
 			public int MatchScore = 50;
 
 			/// <summary>
-			/// The penalty score for correct color discrepancies
+			/// The penalty score for correct color but incorrect spot discrepancies
 			/// </summary>
 			public int PartialMatchScore = 20;
 
@@ -59,17 +66,17 @@ namespace Mastermind
 			public bool LinearCrossover = true;
 
 			/// <summary>
-			/// Varies the crossover amount based on vertain criteria. CrossoverAmount is ignored.
+			/// Varies the crossover amount based on certain criteria. CrossoverAmount is ignored.
 			/// </summary>
 			public bool DynamicCrossoverAmount = false;
 
 			/// <summary>
-			/// Varies the mutation rate based on vertain criteria. MutationRate is ignored.
+			/// Varies the mutation rate based on certain criteria. MutationRate is ignored.
 			/// </summary>
 			public bool DynamicMutationRate = true;
 
 			/// <summary>
-			/// Pool members with less than this score are elimininated, 0 to disable.
+			/// Pool members with less than this score are eliminated, 0 to disable.
 			/// </summary>
 			public int ScoreCutoff = -500;
 
@@ -84,7 +91,11 @@ namespace Mastermind
 					ElitismCutoff = ElitismCutoff,
 					MatchScore = MatchScore,
 					PartialMatchScore = PartialMatchScore,
-					MaxGenerations = MaxGenerations
+					MaxGenerations = MaxGenerations,
+					LinearCrossover = LinearCrossover,
+					DynamicCrossoverAmount = DynamicCrossoverAmount,
+					DynamicMutationRate = DynamicMutationRate,
+					ScoreCutoff = ScoreCutoff
 				};
 			}
 		}
@@ -103,11 +114,19 @@ namespace Mastermind
 			}
 		}
 
-		//SortedSet<PoolMember> sorted = new SortedSet<PoolMember>();
-
+		/// <summary>
+		/// The genetic pool.
+		/// </summary>
 		private PoolMember[] Pool;
+
+		/// <summary>
+		/// The number of generations in the last update
+		/// </summary>
 		private int Generations = 0;
 
+		/// <summary>
+		/// Genetic solver constructor
+		/// </summary>
 		public GeneticSolver()
 		{
 
@@ -130,10 +149,10 @@ namespace Mastermind
 		}
 
 		/// <summary>
-		/// Score the row probabity compared to the previous guess
+		/// Score the row possibility compared to the given guess
 		/// </summary>
 		/// <param name="Row">The row to score</param>
-		/// <param name="PlayedRow">The previous scored row</param>
+		/// <param name="PlayedRow">The previously scored row</param>
 		/// <returns>0 if the row is a possible fit, decreasing values the worse the fit is</returns>
 		private int CompareRows(RowState Row, BoardRow PlayedRow)
 		{
@@ -142,6 +161,7 @@ namespace Mastermind
 		int SamePosAndColor = 0, SameColor = 0;
 		int Score = 0;
 
+			//Score reds
 			for (int i = 0; i < Row.Length; i++)
 			{
 				if (Row[i] == PlayedRow.Row[i])
@@ -154,6 +174,7 @@ namespace Mastermind
 		int MatchDifference = Math.Abs(PlayedRow.Score.NumCorrectSpot - SamePosAndColor);
 			Score -= Settings.MatchScore * MatchDifference;
 
+			//Score whites
 			for (int i = 0; i < Row.Length; i++)
 			{
 				for (int j = 0; j < Row.Length && !RowMatched[i]; j++)
@@ -187,7 +208,7 @@ namespace Mastermind
 		}
 
 		/// <summary>
-		/// Sort the pool in decending order
+		/// Sort the pool in descending order
 		/// </summary>
 		private void SortPool()
 		{
@@ -216,6 +237,7 @@ namespace Mastermind
 		/// <summary>
 		/// Selects a suitable parent for crossover operations
 		/// </summary>
+		/// <param name="MaxIndex">Ignore pool members higher than this index</param>
 		/// <returns>A parent index to use</returns>
 		private int SelectParent(int MaxIndex)
 		{
@@ -252,6 +274,7 @@ namespace Mastermind
 		/// <summary>
 		/// Performs the selection, crossover and mutation operations on the pool
 		/// </summary>
+		/// <param name="Board">The board to use</param>
 		private void Evolve(GameBoard Board)
 		{
 			//Score and sort from the last guess
@@ -260,20 +283,19 @@ namespace Mastermind
 
 			Generations = 0;
 
-			//Keep evolving until a possible solution is found (at least one generation though), or a max number of generations have occured
+			//Keep evolving until a possible solution is found (with at least one generation), or a max number of generations have occurred
 			do
 			{
 				PerformEvolveOperations(Board);
 				ScorePool(Board);
 				SortPool();
-
-				Generations++;
-			} while (Generations < Settings.MaxGenerations && Pool[0].Score != 0);
+			} while (++Generations < Settings.MaxGenerations && Pool[0].Score != 0);
 		}
 
 		/// <summary>
 		/// Performs the selection, crossover and mutation operations on the pool
 		/// </summary>
+		/// <param name="Board">The board to use</param>
 		private void PerformEvolveOperations(GameBoard Board)
 		{
 		int Columns = Pool[0].Row.Length;
@@ -285,7 +307,7 @@ namespace Mastermind
 		byte[] ShuffleColor = new byte[Columns * 2];
 		bool[] Selected = new bool[Columns];
 
-		PoolMember[] NewPool = new PoolMember[Settings.PoolSize];
+		PoolMember[] NewPool = new PoolMember[Settings.PoolSize]; //TODO: Look into using a backbuffer pool
 		int NewPoolIndex = 0;
 
 			//Copy elite members
@@ -435,6 +457,7 @@ namespace Mastermind
 			}
 			while (Board.Guesses.Exists(m => m.Row == Guess.Row));
 
+			//Calculate some diagnostic information
 		long PoolScore = 0;
 
 			for (int i = 0; i < Pool.Length; i++)
