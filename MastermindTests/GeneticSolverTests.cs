@@ -51,7 +51,7 @@ namespace Mastermind.Tests
 
 			for(int i = 0; i < Settings.PoolSize * 1000; i ++)
 			{
-				int index = (int)GSpriv.Invoke("SelectParent");
+				int index = (int)GSpriv.Invoke("SelectParent", Settings.PoolSize);
 				Assert.IsTrue(index >= 0);
 				Assert.IsTrue(index < Settings.PoolSize);
 				SelectCounts[index / 10]++;
