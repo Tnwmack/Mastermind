@@ -10,7 +10,7 @@ namespace Mastermind
 	/// <summary>
 	/// An interface for mapping generic color IDs to brushes
 	/// </summary>
-	public interface ColorMapping
+	public interface IColorMapping
 	{
 		/// <summary>
 		/// Returns a brush for the given generic ID

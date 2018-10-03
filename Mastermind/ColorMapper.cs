@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace Mastermind
 {
-	class ColorMapper : ColorMapping
+	class ColorMapper : IColorMapping
 	{
 		private Brush[] Brushes = new Brush[20];
 

@@ -16,13 +16,13 @@ namespace CustomControlsLibrary
 	/// </summary>
 	public partial class BoardControl : ScrollableControl
 	{
-		//A list of rows to display
+		//The list of rows to display
 		private List<BoardRow> Rows = new List<BoardRow>();
 
 		/// <summary>
 		/// The color mapping to use
 		/// </summary>
-		public ColorMapping Colors = new TempColors();
+		public IColorMapping Colors = new TempColors();
 
 		/// <summary>
 		/// The number of columns
@@ -103,7 +103,6 @@ namespace CustomControlsLibrary
 		/// <returns>The location to draw the peg</returns>
 		protected RectangleF GetPegRect(int Column, int Row, float MinHeight)
 		{
-			//float PegPadding = 5.0f;
 			float ColumnWidth = (ClientSize.Width - ScoreColumnWidth) / Columns;
 			float RowHeight = Math.Max(MinHeight, ColumnWidth);
 
@@ -134,6 +133,7 @@ namespace CustomControlsLibrary
 		Graphics g = pe.Graphics;
 			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+			//Recalculate the board width and scroll area height
 			if (RecalculateScrollSize && Rows.Count > 0)
 			{
 			SizeF MaxScoreWidth = new SizeF();
@@ -148,10 +148,8 @@ namespace CustomControlsLibrary
 
 				ScoreColumnWidth = MaxScoreWidth.Width;
 
-			SizeF TestScoreSize = g.MeasureString(Rows[Rows.Count - 1].Score.ToString(), ScoreFont);
-
-			RectangleF EndPegPos = GetPegRect(0, Rows.Count - 1, TestScoreSize.Height);
-			RectangleF EndScorePos = GetScoreRect(Rows.Count - 1, TestScoreSize.Height);
+			RectangleF EndPegPos = GetPegRect(0, Rows.Count - 1, MaxScoreWidth.Height);
+			RectangleF EndScorePos = GetScoreRect(Rows.Count - 1, MaxScoreWidth.Height);
 			float EndPos = Math.Max(EndPegPos.Bottom, EndScorePos.Bottom);
 
 				AutoScrollMinSize = new Size(0, (int)EndPos + 2); //+2 for border clipping

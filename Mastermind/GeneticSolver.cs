@@ -250,8 +250,6 @@ namespace Mastermind
 			x *= UsablePoolSize;
 			int Result = (int)Math.Floor(x);
 
-			//TODO: Limit result to a reasonable minimum number limit like 25% 
-
 			return Result < UsablePoolSize ? Result : UsablePoolSize - 1; //This actually can happen
 		}
 

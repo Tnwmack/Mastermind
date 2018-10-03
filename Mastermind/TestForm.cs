@@ -35,6 +35,9 @@ namespace Mastermind
 			LabelText.Add(FailuresLabel, FailuresLabel.Text);
 		}
 
+		/// <summary>
+		/// Enables and disables the run and stop buttons based on the current state.
+		/// </summary>
 		private void SetButtonStates()
 		{
 			if (this.InvokeRequired)

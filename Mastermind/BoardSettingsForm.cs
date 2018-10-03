@@ -28,10 +28,15 @@ namespace Mastermind
 			else
 				RowsComboBox.SelectedIndex = Settings.Rows - 1;
 
-			ColumnsComboBox.SelectedIndex = Settings.Columns - 4;
 			ColorsComboBox.SelectedIndex = Settings.Colors - 2;
+			ColumnsComboBox.SelectedIndex = Settings.Columns - 4;
 		}
 
+		/// <summary>
+		/// Confirms the new board settings.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Control.OnClick(EventArgs)"/></param>
 		private void OKButton_Click(object sender, EventArgs e)
 		{
 			if (RowsComboBox.SelectedIndex == 20)
@@ -43,6 +48,11 @@ namespace Mastermind
 			Settings.Columns = ColumnsComboBox.SelectedIndex + 4;
 		}
 
+		/// <summary>
+		/// Dismisses the settings form.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Control.OnClick(EventArgs)"/></param>
 		private void CancelButton_Click(object sender, EventArgs e)
 		{
 
