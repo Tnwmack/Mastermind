@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Mastermind
 {
-	public partial class TestForm : Form
+	partial class TestForm : Form
 	{
 		public TestForm()
 		{
@@ -26,6 +26,7 @@ namespace Mastermind
 		private bool TestInProgress = false;
 		private Dictionary<Control, String> LabelText = new Dictionary<Control, string>();
 
+		/// <see cref="Form.OnLoad(EventArgs)"/>
 		private void TestForm_Load(object sender, EventArgs e)
 		{
 			LabelText.Add(IterationLabel, IterationLabel.Text);
@@ -77,7 +78,8 @@ namespace Mastermind
 		{
 			if(TestInProgress)
 			{
-				MessageBox.Show("Stop tests before closing this window");
+				MessageBox.Show("Stop tests before closing this window", "Error", 
+					MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 				e.Cancel = true;
 			}
 		}

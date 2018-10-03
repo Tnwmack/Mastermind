@@ -40,6 +40,10 @@ namespace Mastermind
 			AnswerKeyControl.NumColors = Settings.Colors;
 		}
 
+		/// <summary>
+		/// Resets the global game state and sets up a new game.
+		/// </summary>
+		/// <param name="Answer">The answer to use for the new game.</param>
 		private void GenerateGame(RowState Answer)
 		{
 			AI.Reset();
@@ -53,11 +57,19 @@ namespace Mastermind
 			UpdateGameState();
 		}
 
-		private void Form1_Load(object sender, EventArgs e)
+		/// <see cref="Form.OnLoad(EventArgs)"/>
+		private void MainMenu_Load(object sender, EventArgs e)
 		{
-
+			
 		}
 
+		/// <see cref="Form.OnShown(EventArgs)"/>
+		private void MainMenu_Shown(object sender, EventArgs e)
+		{
+			
+		}
+
+		/// <see cref="ComboBox.OnSelectedIndexChanged(EventArgs)"/>
 		private void AITypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			switch(AITypeComboBox.SelectedIndex)
@@ -82,6 +94,11 @@ namespace Mastermind
 			GenerateGame(AnswerKeyControl.CurrentAnswer);
 		}
 
+		/// <summary>
+		/// Shows the currently selected solver's settings dialog.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Control.OnClick(EventArgs)"/></param>
 		private void SolverButton_Click(object sender, EventArgs e)
 		{
 			if (GuessThreadWorking)
@@ -90,6 +107,9 @@ namespace Mastermind
 			Master.AI.ShowSettingsDialog();
 		}
 
+		/// <summary>
+		/// Gets a guess from the current AI system. Runs in a separate thread.
+		/// </summary>
 		private void GetGuess()
 		{
 			GuessThreadWorking = true;
@@ -110,6 +130,11 @@ namespace Mastermind
 			GuessThreadWorking = false;
 		}
 
+		/// <summary>
+		/// Begins the process of getting a guess.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Control.OnClick(EventArgs)"/></param>
 		private void GuessButton_Click(object sender, EventArgs e)
 		{
 			if (GuessThreadWorking)
@@ -122,19 +147,29 @@ namespace Mastermind
 			GuessThread.Start();
 		}
 
+		/// <summary>
+		/// Updates the game state label.
+		/// </summary>
 		private void UpdateGameState()
 		{
 			switch(Master.Board.CurrentGameState)
 			{
 				case GameBoard.GameState.InProgress:
+					GameStateLabel.Font = new Font("Microsoft Sans Serif", 8.0f, FontStyle.Regular, GraphicsUnit.Point);
+					GameStateLabel.ForeColor = SystemColors.ControlText;
 					GameStateLabel.Text = "Game In Progress";
+					GameStateLabel.Invalidate();
 					break;
 
 				case GameBoard.GameState.Won:
+					GameStateLabel.Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold, GraphicsUnit.Point);
+					GameStateLabel.ForeColor = Color.Green;
 					GameStateLabel.Text = "Game Won!";
 					break;
 
 				case GameBoard.GameState.Lost:
+					GameStateLabel.Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold, GraphicsUnit.Point);
+					GameStateLabel.ForeColor = Color.DarkRed;
 					GameStateLabel.Text = "Game Lost!";
 					break;
 			}
@@ -142,6 +177,11 @@ namespace Mastermind
 			SolverStatusLabel.Text = AI.GetMessage();
 		}
 
+		/// <summary>
+		/// Resets the game at the user's request.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Control.OnClick(EventArgs)"/></param>
 		private void ResetButton_Click(object sender, EventArgs e)
 		{
 			if (GuessThreadWorking)
@@ -150,6 +190,11 @@ namespace Mastermind
 			GenerateGame(AnswerKeyControl.CurrentAnswer);
 		}
 
+		/// <summary>
+		/// Opens the game board settings dialog.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Control.OnClick(EventArgs)"/></param>
 		private void BoardSettingsButton_Click(object sender, EventArgs e)
 		{
 			if (GuessThreadWorking)
@@ -168,6 +213,11 @@ namespace Mastermind
 			}
 		}
 
+		/// <summary>
+		/// Called when the answer is changed by the user. Either rejects the 
+		/// user input or generates a new game.
+		/// </summary>
+		/// <param name="NewAnswer">The answer the user selected.</param>
 		private void AnswerKeyControl_OnAnswerChanged(RowState NewAnswer)
 		{
 			if (GuessThreadWorking)
@@ -179,13 +229,18 @@ namespace Mastermind
 			GenerateGame(NewAnswer);
 		}
 
+		/// <summary>
+		/// Opens the test run form.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Control.OnClick(EventArgs)"/></param>
 		private void TestButton_Click(object sender, EventArgs e)
 		{
 			if (GuessThreadWorking)
 				return;
 
 			TestForm TestingForm = new TestForm();
-			//Events called in seprate thread
+			//Events called in separate thread
 			TestingForm.OnRunClicked += TestingForm_OnRunClicked;
 			TestingForm.OnStopClicked += TestingForm_OnCancelClicked;
 
@@ -194,11 +249,20 @@ namespace Mastermind
 
 		private volatile bool CancelTesting;
 
+		/// <summary>
+		/// Called when the user wants to cancel the testing routine.
+		/// </summary>
+		/// <param name="Sender">The test form handle.</param>
 		private void TestingForm_OnCancelClicked(TestForm Sender)
 		{
 			CancelTesting = true;
 		}
 
+		/// <summary>
+		/// Begins a test run.
+		/// </summary>
+		/// <param name="Sender">The test form handle.</param>
+		/// <param name="Iterations">The number of runs to perform.</param>
 		private void TestingForm_OnRunClicked(TestForm Sender, int Iterations)
 		{
 			CancelTesting = false;
@@ -244,5 +308,7 @@ namespace Mastermind
 
 			Sender.OnTestsCompleted();
 		}
+
+		
 	}
 }

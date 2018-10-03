@@ -50,27 +50,15 @@ namespace CustomControlsLibrary
 			get { return ColumnColors.Length; }
 		}
 
-		private int numColors = 1;
-
 		/// <summary>
 		/// The number of colors to choose from
 		/// </summary>
-		public int NumColors
-		{
-			get { return numColors; }
-			set { numColors = value; }
-		}
-
-		private float pegBorderSize = 2.0f;
+		public int NumColors { get; set; } = 1;
 
 		/// <summary>
 		/// The size of the black peg border in pixels
 		/// </summary>
-		public float PegBorderSize
-		{
-			get { return pegBorderSize; }
-			set { pegBorderSize = value; }
-		}
+		public float PegBorderSize { get; set; } = 2.0f;
 
 		private Brush PegBackColor = new SolidBrush(Color.Black);
 

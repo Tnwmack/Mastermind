@@ -250,6 +250,8 @@ namespace Mastermind
 			x *= UsablePoolSize;
 			int Result = (int)Math.Floor(x);
 
+			//TODO: Limit result to a reasonable minimum number limit like 25% 
+
 			return Result < UsablePoolSize ? Result : UsablePoolSize - 1; //This actually can happen
 		}
 
@@ -262,13 +264,18 @@ namespace Mastermind
 			if (Settings.ScoreCutoff == 0)
 				return Pool.Length;
 
+		int MinIndex = 0;
+
 			for (int i = 0; i < Pool.Length; i ++)
 			{
 				if (Pool[i].Score < Settings.ScoreCutoff)
-					return i;
+				{
+					MinIndex = i;
+					break;
+				}
 			}
 
-			return Pool.Length;
+			return Math.Max(Pool.Length / 4, MinIndex);
 		}
 
 		/// <summary>
