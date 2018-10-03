@@ -230,6 +230,7 @@ namespace Mastermind
 		/// </summary>
 		/// <param name="Colors">The row to check</param>
 		/// <param name="Row">A played row with score</param>
+		/// <param name="Board">The game board in use.</param>
 		/// <returns>True if the row can be a solution</returns>
 		private bool IsConsistent(RowState Colors, BoardRow Row, GameBoard Board)
 		{

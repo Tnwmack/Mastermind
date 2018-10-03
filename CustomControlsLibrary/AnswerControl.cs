@@ -30,7 +30,7 @@ namespace CustomControlsLibrary
 		/// <summary>
 		/// The color mapping to use
 		/// </summary>
-		public ColorMapping Colors = new TempColors();
+		public IColorMapping Colors = new TempColors();
 
 		/// <summary>
 		/// The answer currently displayed
@@ -50,27 +50,15 @@ namespace CustomControlsLibrary
 			get { return ColumnColors.Length; }
 		}
 
-		private int numColors = 1;
-
 		/// <summary>
 		/// The number of colors to choose from
 		/// </summary>
-		public int NumColors
-		{
-			get { return numColors; }
-			set { numColors = value; }
-		}
-
-		private float pegBorderSize = 2.0f;
+		public int NumColors { get; set; } = 1;
 
 		/// <summary>
 		/// The size of the black peg border in pixels
 		/// </summary>
-		public float PegBorderSize
-		{
-			get { return pegBorderSize; }
-			set { pegBorderSize = value; }
-		}
+		public float PegBorderSize { get; set; } = 2.0f;
 
 		private Brush PegBackColor = new SolidBrush(Color.Black);
 
@@ -93,11 +81,7 @@ namespace CustomControlsLibrary
 		public void SetAnswer(RowState NewAnswer)
 		{
 			ColumnColors = new byte[NewAnswer.Length];
-
-			for (int i = 0; i < NewAnswer.Length; i++)
-			{
-				ColumnColors[i] = NewAnswer[i];
-			}
+			NewAnswer.CopyTo(ColumnColors);
 
 			Invalidate();
 		}
@@ -146,28 +130,23 @@ namespace CustomControlsLibrary
 		/// Changes the displayed peg on the answer key
 		/// </summary>
 		/// <param name="e">Mouse event data</param>
-		protected override void OnMouseClick(MouseEventArgs e)
+		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			base.OnMouseClick(e);
 
+			//Cycle through the colors in the clicked column
 			if (e.Button == MouseButtons.Left)
 			{
 				for (int i = 0; i < Columns; i++)
 				{
 					if (GetPegRect(i).Contains(e.Location))
 					{
-						ColumnColors[i]++;
-
-						if (ColumnColors[i] == NumColors)
-						{
-							ColumnColors[i] = 0;
-						}
-
+						ColumnColors[i] = (byte)(++ColumnColors[i] % NumColors);
 						break;
 					}
 				}
 			}
-			else if (e.Button == MouseButtons.Right)
+			else if (e.Button == MouseButtons.Right) //Generate a random color row
 			{
 			RowState NewRS = RowState.GetRandomColors(Generator, NumColors, Columns);
 

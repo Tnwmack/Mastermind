@@ -21,11 +21,8 @@ namespace Mastermind
 		/// <param name="InitColors">The colors to use for the row</param>
 		public RowState(params byte[] InitColors)
 		{
-			//Colors = (byte[])InitColors.Clone();
 			Colors = new byte[InitColors.Length];
-
-			for (int i = InitColors.Length - 1; i >= 0; i--)
-				Colors[i] = InitColors[i];
+			Array.Copy(InitColors, Colors, InitColors.Length);
 		}
 
 		/// <summary>

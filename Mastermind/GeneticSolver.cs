@@ -262,13 +262,18 @@ namespace Mastermind
 			if (Settings.ScoreCutoff == 0)
 				return Pool.Length;
 
+		int MinIndex = 0;
+
 			for (int i = 0; i < Pool.Length; i ++)
 			{
 				if (Pool[i].Score < Settings.ScoreCutoff)
-					return i;
+				{
+					MinIndex = i;
+					break;
+				}
 			}
 
-			return Pool.Length;
+			return Math.Max(Pool.Length / 4, MinIndex);
 		}
 
 		/// <summary>

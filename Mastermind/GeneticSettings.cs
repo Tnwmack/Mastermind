@@ -19,6 +19,14 @@ namespace Mastermind
 			InitializeComponent();
 		}
 
+		/// <summary>
+		/// Validates a text input by parsing and bounds checking. Changes box background on failure.
+		/// </summary>
+		/// <typeparam name="T">The desired parsed type, must support "TryParse" and "CompareTo".</typeparam>
+		/// <param name="Box">The TextBox to parse.</param>
+		/// <param name="Min">The minimum allowed value.</param>
+		/// <param name="Max">The maximum allowed value.</param>
+		/// <returns>True if the text was parsed correctly and is within the bounds.</returns>
 		private bool ValidateBox<T>(TextBox Box, T Min, T Max) where T : IComparable<T>
 		{
 			if (String.IsNullOrEmpty(Box.Text))
@@ -59,69 +67,97 @@ namespace Mastermind
 			}
 		}
 
+		/// <see cref="Control.OnValidating(CancelEventArgs)"/>
 		private void PoolSizeTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
 		}
 
+		/// <see cref="Control.OnValidating(CancelEventArgs)"/>
 		private void CrossoversTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
 		}
 
+		/// <see cref="Control.OnValidating(CancelEventArgs)"/>
 		private void MutationTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
 		}
 
+		/// <see cref="Control.OnValidating(CancelEventArgs)"/>
 		private void ElitismTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
 		}
 
+		/// <see cref="Control.OnValidating(CancelEventArgs)"/>
 		private void MatchTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
 		}
 
+		/// <see cref="Control.OnValidating(CancelEventArgs)"/>
 		private void PartialTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
 		}
 
+		/// <see cref="Control.OnValidating(CancelEventArgs)"/>
 		private void CutoffTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
 		}
 
+		/// <see cref="Control.OnValidating(CancelEventArgs)"/>
 		private void GenerationsTextBox_Validating(object sender, CancelEventArgs e)
 		{
 			if (!ValidateAll())
 				e.Cancel = true;
 		}
 
+		/// <summary>
+		/// Disables or enables the crossovers textbox when the dynamic checkbox changes.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="CheckBox.OnCheckedChanged(EventArgs)"/></param>
 		private void DynCrossoversCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			CrossoversTextBox.Enabled = !DynCrossoversCheckBox.Checked;
 		}
 
+		/// <summary>
+		/// Disables or enables the mutations textbox when the dynamic checkbox changes.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="CheckBox.OnCheckedChanged(EventArgs)"/></param>
 		private void DynMutationsCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
 			MutationTextBox.Enabled = !DynMutationsCheckBox.Checked;
 		}
 
+		/// <summary>
+		/// Closes the settings form with an ok result.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Button.OnClick(EventArgs)"/></param>
 		private void OKButton_Click(object sender, EventArgs e)
 		{
 			//ValidateAll();
 		}
 
+		/// <summary>
+		/// Sets the controls to the initial settings.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Form.OnLoad(EventArgs)"/></param>
 		private void GeneticSettings_Load(object sender, EventArgs e)
 		{
 			if (Settings == null)
@@ -140,6 +176,10 @@ namespace Mastermind
 			LinearCheckBox.Checked = Settings.LinearCrossover;
 		}
 
+		/// <summary>
+		/// Validates all of the form controls.
+		/// </summary>
+		/// <returns>True if all controls validated correctly.</returns>
 		private bool ValidateAll()
 		{
 			if (!ValidateBox<Int32>(PoolSizeTextBox, 0, Int32.MaxValue))
@@ -169,6 +209,11 @@ namespace Mastermind
 			return true;
 		}
 
+		/// <summary>
+		/// Saves the settings if ok was clicked and the controls validate.
+		/// </summary>
+		/// <param name="sender">The control handle.</param>
+		/// <param name="e"><see cref="Form.OnFormClosing(FormClosingEventArgs)"/></param>
 		private void GeneticSettings_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			if(DialogResult == DialogResult.OK)

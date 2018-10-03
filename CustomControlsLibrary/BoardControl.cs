@@ -16,47 +16,29 @@ namespace CustomControlsLibrary
 	/// </summary>
 	public partial class BoardControl : ScrollableControl
 	{
-		//A list of rows to display
+		//The list of rows to display
 		private List<BoardRow> Rows = new List<BoardRow>();
 
 		/// <summary>
 		/// The color mapping to use
 		/// </summary>
-		public ColorMapping Colors = new TempColors();
-
-		private int columns = 4;
+		public IColorMapping Colors = new TempColors();
 
 		/// <summary>
 		/// The number of columns
 		/// </summary>
-		public int Columns
-		{
-			get { return columns; }
-			set { columns = value; }
-		}
-
-		private float scoreColumnWidth = 15.0f;
+		public int Columns { get; set; } = 4;
 
 		/// <summary>
-		/// Thw width of the score column in pixels
+		/// The width of the score column in pixels
 		/// </summary>
-		public float ScoreColumnWidth
-		{
-			get{return scoreColumnWidth;}
-			set{scoreColumnWidth = value;}
-		}
-
-		private float pegBorderSize = 2.0f;
+		public float ScoreColumnWidth { get; set; } = 15.0f;
 
 		/// <summary>
 		/// The size of the black peg border in pixels
 		/// </summary>
-		public float PegBorderSize
-		{
-			get{return pegBorderSize;}
-			set{pegBorderSize = value;}
-		}
-		
+		public float PegBorderSize { get; set; } = 2.0f;
+
 		//When true, the auto scroll min size needs to be updated
 		private bool RecalculateScrollSize = true;
 
@@ -121,7 +103,6 @@ namespace CustomControlsLibrary
 		/// <returns>The location to draw the peg</returns>
 		protected RectangleF GetPegRect(int Column, int Row, float MinHeight)
 		{
-			//float PegPadding = 5.0f;
 			float ColumnWidth = (ClientSize.Width - ScoreColumnWidth) / Columns;
 			float RowHeight = Math.Max(MinHeight, ColumnWidth);
 
@@ -152,11 +133,23 @@ namespace CustomControlsLibrary
 		Graphics g = pe.Graphics;
 			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+			//Recalculate the board width and scroll area height
 			if (RecalculateScrollSize && Rows.Count > 0)
 			{
-			SizeF TestScoreSize = g.MeasureString(Rows[Rows.Count - 1].Score.ToString(), ScoreFont);
-			RectangleF EndPegPos = GetPegRect(0, Rows.Count - 1, TestScoreSize.Height);
-			RectangleF EndScorePos = GetScoreRect(Rows.Count - 1, TestScoreSize.Height);
+			SizeF MaxScoreWidth = new SizeF();
+
+				foreach (BoardRow b in Rows)
+				{
+					SizeF Temp = g.MeasureString(b.Score.ToString(), ScoreFont);
+
+					if (Temp.Width > MaxScoreWidth.Width)
+						MaxScoreWidth = Temp;
+				}
+
+				ScoreColumnWidth = MaxScoreWidth.Width;
+
+			RectangleF EndPegPos = GetPegRect(0, Rows.Count - 1, MaxScoreWidth.Height);
+			RectangleF EndScorePos = GetScoreRect(Rows.Count - 1, MaxScoreWidth.Height);
 			float EndPos = Math.Max(EndPegPos.Bottom, EndScorePos.Bottom);
 
 				AutoScrollMinSize = new Size(0, (int)EndPos + 2); //+2 for border clipping

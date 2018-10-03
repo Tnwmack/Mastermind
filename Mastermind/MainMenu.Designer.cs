@@ -90,9 +90,10 @@
 			// GameStateLabel
 			// 
 			this.GameStateLabel.AutoSize = true;
+			this.GameStateLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.GameStateLabel.Location = new System.Drawing.Point(12, 181);
 			this.GameStateLabel.Name = "GameStateLabel";
-			this.GameStateLabel.Size = new System.Drawing.Size(35, 13);
+			this.GameStateLabel.Size = new System.Drawing.Size(51, 20);
 			this.GameStateLabel.TabIndex = 7;
 			this.GameStateLabel.Text = "label1";
 			// 
@@ -178,7 +179,8 @@
 			this.Name = "MainMenu";
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
 			this.Text = "Mastermind";
-			this.Load += new System.EventHandler(this.Form1_Load);
+			this.Load += new System.EventHandler(this.MainMenu_Load);
+			this.Shown += new System.EventHandler(this.MainMenu_Shown);
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
