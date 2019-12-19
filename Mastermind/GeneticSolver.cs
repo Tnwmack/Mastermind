@@ -11,12 +11,11 @@ namespace Mastermind
 	/// </summary>
 	public class GeneticSolver : Solver
 	{
+		public event Action<string> SetMessage;
+
 		private Random Generator = new Random();
 
-		/// <summary>
-		/// The current status to send to the GUI.
-		/// </summary>
-		private string Status = "";
+		private volatile bool AbortProcessing = false;
 
 		/// <summary>
 		/// Holds settings for the solver
@@ -118,11 +117,6 @@ namespace Mastermind
 		/// The genetic pool.
 		/// </summary>
 		private PoolMember[] Pool;
-
-		/// <summary>
-		/// The number of generations in the last update
-		/// </summary>
-		private int Generations = 0;
 
 		/// <summary>
 		/// Genetic solver constructor
@@ -286,7 +280,7 @@ namespace Mastermind
 			ScorePool(Board);
 			SortPool();
 
-			Generations = 0;
+			int Generations = 0;
 
 			//Keep evolving until a possible solution is found (with at least one generation), or a max number of generations have occurred
 			do
@@ -294,7 +288,8 @@ namespace Mastermind
 				PerformEvolveOperations(Board);
 				ScorePool(Board);
 				SortPool();
-			} while (++Generations < Settings.MaxGenerations && Pool[0].Score != 0);
+				UpdateMessage(Pool[0], Generations + 1);
+			} while (++Generations < Settings.MaxGenerations && Pool[0].Score != 0 && !AbortProcessing);
 		}
 
 		/// <summary>
@@ -438,6 +433,31 @@ namespace Mastermind
 			Pool = NewPool;
 		}
 
+		private void UpdateMessage(PoolMember BestGuess, int Generation)
+		{
+			//Calculate some diagnostic information
+			long PoolScore = 0;
+
+			for (int i = 0; i < Pool.Length; i++)
+			{
+				PoolScore += Pool[i].Score;
+			}
+
+			int AveragePoolScore = (int)(PoolScore / Pool.Length);
+
+			PoolScore = 0;
+
+			for (int i = 0; i < Settings.ElitismCutoff; i++)
+			{
+				PoolScore += Pool[i].Score;
+			}
+
+			int ElitePoolScore = (int)(PoolScore / Settings.ElitismCutoff);
+
+			SetMessage?.Invoke(string.Format("Best: {0}, Elite: {1}, Pool: {2}, Generations: {3}",
+				BestGuess.Score, ElitePoolScore, AveragePoolScore, Generation));
+		}
+
 		/// <see cref="Solver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
 		{
@@ -462,28 +482,6 @@ namespace Mastermind
 			}
 			while (Board.Guesses.Exists(m => m.Row == Guess.Row));
 
-			//Calculate some diagnostic information
-		long PoolScore = 0;
-
-			for (int i = 0; i < Pool.Length; i++)
-			{
-				PoolScore += Pool[i].Score;
-			}
-
-		int AveragePoolScore = (int)(PoolScore / Pool.Length);
-
-			PoolScore = 0;
-
-			for (int i = 0; i < Settings.ElitismCutoff; i++)
-			{
-				PoolScore += Pool[i].Score;
-			}
-
-		int ElitePoolScore = (int)(PoolScore / Settings.ElitismCutoff);
-
-			Status = string.Format("Best: {0}, Elite: {1}, Pool: {2}, Generations: {3}", 
-				Guess.Score, ElitePoolScore, AveragePoolScore, Generations);
-
 			return Guess.Row;
 		}
 
@@ -507,13 +505,14 @@ namespace Mastermind
 		public void Reset()
 		{
 			Pool = null;
+			AbortProcessing = false;
 			GC.Collect();
 		}
 
-		/// <see cref="Solver.GetMessage"/>
-		public string GetMessage()
+		/// <see cref="Solver.Abort"/>
+		public void Abort()
 		{
-			return Status;
+			AbortProcessing = true;
 		}
 	}
 }

@@ -179,6 +179,7 @@
 			this.Name = "MainMenu";
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
 			this.Text = "Mastermind";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainMenu_FormClosing);
 			this.Load += new System.EventHandler(this.MainMenu_Load);
 			this.Shown += new System.EventHandler(this.MainMenu_Shown);
 			this.statusStrip1.ResumeLayout(false);

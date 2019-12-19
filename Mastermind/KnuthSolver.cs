@@ -11,6 +11,10 @@ namespace Mastermind
 {
 	class KnuthSolver : Solver
 	{
+		public event Action<string> SetMessage;
+
+		private volatile bool AbortProcessing = false;
+
 		/// <summary>
 		/// Holds settings for the Knuth solver
 		/// </summary>
@@ -288,7 +292,7 @@ namespace Mastermind
 				{
 					RowState Row;
 
-					while(Pool.TryTake(out Row))
+					while(Pool.TryTake(out Row) && !AbortProcessing)
 					{
 						if (IsConsistent(Row, LastGuess, Board))
 						{
@@ -343,6 +347,8 @@ namespace Mastermind
 				Evolve(Board);
 			}
 
+			SetMessage?.Invoke("Pool Size: " + Pool.Count.ToString("##,#"));
+
 			return ChooseGuess();
 		}
 
@@ -351,7 +357,14 @@ namespace Mastermind
 		{
 			//Pool?.Clear();
 			Pool = null;
+			AbortProcessing = false;
 			GC.Collect();
+		}
+
+		/// <see cref="Solver.Abort"/>
+		public void Abort()
+		{
+			AbortProcessing = true;
 		}
 
 		/// <see cref="Solver.ShowSettingsDialog"/>
@@ -367,19 +380,6 @@ namespace Mastermind
 					Settings = SettDlg.Settings;
 					Reset();
 				}
-			}
-		}
-
-		/// <see cref="Solver.GetMessage"/>
-		public string GetMessage()
-		{
-			if (Pool != null)
-			{
-				return "Pool Size: " + Pool.Count.ToString("##,#");
-			}
-			else
-			{
-				return "";
 			}
 		}
 	}

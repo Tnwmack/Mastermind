@@ -29,9 +29,13 @@ namespace Mastermind
 		void Reset();
 
 		/// <summary>
+		/// Called when all long operations must stop immediatly
+		/// </summary>
+		void Abort();
+
+		/// <summary>
 		/// Gets a status message to display to the user
 		/// </summary>
-		/// <returns>The status to display</returns>
-		string GetMessage();
+		event Action<string> SetMessage;
 	}
 }

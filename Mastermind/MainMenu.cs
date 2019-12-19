@@ -24,6 +24,8 @@ namespace Mastermind
 
 		private volatile bool GuessThreadWorking = false;
 
+		private Action<string> OnSetMessageDelegate;
+
 		/// <summary>
 		/// Creates the main form of the program
 		/// </summary>
@@ -38,6 +40,8 @@ namespace Mastermind
 
 			AnswerKeyControl.SetAnswer(new RowState(new byte[Settings.Columns]));
 			AnswerKeyControl.NumColors = Settings.Colors;
+
+			OnSetMessageDelegate = new Action<string>(OnSetMessage);
 		}
 
 		/// <summary>
@@ -91,7 +95,14 @@ namespace Mastermind
 					break;
 			}
 
+			AI.SetMessage -= OnSetMessageDelegate;
+			AI.SetMessage += OnSetMessageDelegate;
 			GenerateGame(AnswerKeyControl.CurrentAnswer);
+		}
+
+		public void OnSetMessage(string Message)
+		{
+			SolverStatusLabel.Text = Message;
 		}
 
 		/// <summary>
@@ -173,8 +184,6 @@ namespace Mastermind
 					GameStateLabel.Text = "Game Lost!";
 					break;
 			}
-
-			SolverStatusLabel.Text = AI.GetMessage();
 		}
 
 		/// <summary>
@@ -309,6 +318,35 @@ namespace Mastermind
 			Sender.OnTestsCompleted();
 		}
 
-		
+		private Timer CloseTimer;
+
+		private void MainMenu_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (GuessThreadWorking && CloseTimer == null)
+			{
+				e.Cancel = true;
+				SolverStatusLabel.Text = "Closing...";
+				Master.AI.Abort();
+
+				CloseTimer = new Timer();
+				CloseTimer.Interval = 1000;
+
+				CloseTimer.Tick += new EventHandler((s, evt) =>
+				{
+					if (!GuessThreadWorking)
+					{
+						this.Close();
+					}
+				});
+
+				CloseTimer.Start();
+			}
+			else if (CloseTimer != null)
+			{
+				CloseTimer.Stop();
+				CloseTimer.Dispose();
+				CloseTimer = null;
+			}
+		}
 	}
 }

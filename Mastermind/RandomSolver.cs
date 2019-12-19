@@ -8,9 +8,10 @@ namespace Mastermind
 	/// </summary>
 	class RandomSolver : Solver
 	{
+		public event Action<string> SetMessage;
 		private Random Generator = new Random();
 
-		/// <see cref="Solver.GetMessage"/>
+		/// <see cref="Solver.GetGuess"/>
 		public RowState GetGuess(GameBoard Board)
 		{
 			return RowState.GetRandomColors(Generator, Board.NumColors, Board.NumColumns);
@@ -29,10 +30,10 @@ namespace Mastermind
 
 		}
 
-		/// <see cref="Solver.GetMessage"/>
-		public string GetMessage()
+		/// <see cref="Solver.Abort"/>
+		public void Abort()
 		{
-			return "";
+
 		}
 	}
 }

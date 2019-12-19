@@ -8,10 +8,18 @@ namespace Mastermind
 {
 	class HybridSolver : Solver
 	{
+		public event Action<string> SetMessage;
+		private Action<string> OnSetMessageDelegate; 
+
 		private GeneticSolver GSolver = new GeneticSolver();
 		private KnuthSolver KSolver = new KnuthSolver();
 
 		private bool InGeneticMode = true;
+
+		public HybridSolver()
+		{
+			OnSetMessageDelegate = new Action<string>(OnSetMessage);
+		}
 
 		/// <see cref="Solver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
@@ -26,6 +34,8 @@ namespace Mastermind
 			{
 				InGeneticMode = false;
 				GSolver.Reset();
+				GSolver.SetMessage -= OnSetMessageDelegate;
+				KSolver.SetMessage += OnSetMessageDelegate;
 			}
 
 			if(InGeneticMode)
@@ -38,16 +48,15 @@ namespace Mastermind
 			}
 		}
 
-		/// <see cref="Solver.GetMessage"/>
-		public string GetMessage()
+		public void OnSetMessage(string Message)
 		{
 			if(InGeneticMode)
 			{
-				return "Genetic Mode: " +  GSolver.GetMessage();
+				SetMessage?.Invoke("Genetic Mode: " + Message);
 			}
 			else
 			{
-				return "Knuth Mode: " + KSolver.GetMessage();
+				SetMessage?.Invoke("Knuth Mode: " + Message);
 			}
 		}
 
@@ -58,6 +67,22 @@ namespace Mastermind
 			KSolver.Reset();
 
 			InGeneticMode = true;
+			KSolver.SetMessage -= OnSetMessageDelegate;
+			GSolver.SetMessage -= OnSetMessageDelegate;
+			GSolver.SetMessage += OnSetMessageDelegate;
+		}
+
+		/// <see cref="Solver.Abort"/>
+		public void Abort()
+		{
+			if (InGeneticMode)
+			{
+				GSolver.Abort();
+			}
+			else
+			{
+				KSolver.Abort();
+			}
 		}
 
 		/// <see cref="Solver.ShowSettingsDialog"/>
