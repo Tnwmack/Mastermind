@@ -86,6 +86,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AVLTree.cs" />
+    <Compile Include="BinaryTree.cs" />
     <Compile Include="BoardSettings.cs" />
     <Compile Include="BoardSettingsForm.cs">
       <SubType>Form</SubType>
@@ -94,6 +96,7 @@
       <DependentUpon>BoardSettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ColorMapper.cs" />
+    <Compile Include="GeneticAlgorithm.cs" />
     <Compile Include="GeneticSettings.cs">
       <SubType>Form</SubType>
     </Compile>

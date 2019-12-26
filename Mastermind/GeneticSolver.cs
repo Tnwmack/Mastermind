@@ -104,8 +104,14 @@ namespace Mastermind
 
 		struct PoolMember : IComparable<PoolMember>
 		{
-			public RowState Row;
-			public int Score;
+			public readonly RowState Row;
+			public readonly int Score;
+
+			public PoolMember(RowState Row, int Score)
+			{
+				this.Row = Row;
+				this.Score = Score;
+			}
 
 			public int CompareTo(PoolMember other)
 			{
@@ -117,6 +123,11 @@ namespace Mastermind
 		/// The genetic pool.
 		/// </summary>
 		private PoolMember[] Pool;
+
+		/// <summary>
+		/// Working pool that swaps with the original pool.
+		/// </summary>
+		private PoolMember[] NewPool;
 
 		/// <summary>
 		/// Genetic solver constructor
@@ -133,14 +144,16 @@ namespace Mastermind
 		public void GeneratePool(GameBoard Board)
 		{
 			Pool = new PoolMember[Settings.PoolSize];
+			NewPool = new PoolMember[Settings.PoolSize];
 
-			for(int i = 0; i < Pool.Length; i ++)
+			for (int i = 0; i < Pool.Length; i ++)
 			{
-			PoolMember NewMember = new PoolMember();
-				NewMember.Row = RowState.GetRandomColors(Generator, Board.NumColors, Board.NumColumns);
-				Pool[i] = NewMember;
+				Pool[i] = new PoolMember(RowState.GetRandomColors(Generator, Board.NumColors, Board.NumColumns), 0);
 			}
 		}
+
+		private bool[] RowColumnMatched; //Used by CompareRows, not local to avoid excessive heap allocations
+		private bool[] GuessColumnMatched; //Used by CompareRows, not local to avoid excessive heap allocations
 
 		/// <summary>
 		/// Score the row possibility compared to the given guess
@@ -150,8 +163,11 @@ namespace Mastermind
 		/// <returns>0 if the row is a possible fit, decreasing values the worse the fit is</returns>
 		private int CompareRows(RowState Row, BoardRow PlayedRow)
 		{
-		bool[] RowMatched = new bool[Row.Length];
-		bool[] GuessMatched = new bool[Row.Length];
+			for (int i = 0; i < Row.Length; i++)
+			{
+				RowColumnMatched[i] = GuessColumnMatched[i] = false;
+			}
+
 		int SamePosAndColor = 0, SameColor = 0;
 		int Score = 0;
 
@@ -161,7 +177,7 @@ namespace Mastermind
 				if (Row[i] == PlayedRow.Row[i])
 				{
 					SamePosAndColor++;
-					RowMatched[i] = GuessMatched[i] = true;
+					RowColumnMatched[i] = GuessColumnMatched[i] = true;
 				}
 			}
 
@@ -171,12 +187,12 @@ namespace Mastermind
 			//Score whites
 			for (int i = 0; i < Row.Length; i++)
 			{
-				for (int j = 0; j < Row.Length && !RowMatched[i]; j++)
+				for (int j = 0; j < Row.Length && !RowColumnMatched[i]; j++)
 				{
-					if ((Row[i] == PlayedRow.Row[j]) && !GuessMatched[j])
+					if (!GuessColumnMatched[j] && (Row[i] == PlayedRow.Row[j]))
 					{
 						SameColor++;
-						GuessMatched[j] = true;
+						GuessColumnMatched[j] = true;
 						break;
 					}
 				}
@@ -197,7 +213,7 @@ namespace Mastermind
 			Parallel.For(0, Pool.Length,
 				(i) =>
 				{
-					Pool[i].Score = EvalRow(Pool[i].Row, Board);
+					Pool[i] = new PoolMember(Pool[i].Row, EvalRow(Pool[i].Row, Board));
 				});
 		}
 
@@ -206,7 +222,8 @@ namespace Mastermind
 		/// </summary>
 		private void SortPool()
 		{
-			ParallelSort.QuicksortParallel(Pool);
+			Array.Sort(Pool);
+			//ParallelSort.QuicksortParallel(Pool);
 			//ParallelSort.QuicksortSequential(Pool);
 		}
 
@@ -306,17 +323,12 @@ namespace Mastermind
 		byte[] NewColorB = new byte[Columns];
 		byte[] ShuffleColor = new byte[Columns * 2];
 		bool[] Selected = new bool[Columns];
-
-		PoolMember[] NewPool = new PoolMember[Settings.PoolSize]; //TODO: Look into using a backbuffer pool
-		int NewPoolIndex = 0;
+		int NewPoolIndex = Settings.ElitismCutoff;
+		float CrossoverAmount = Settings.CrossoverAmount;
 
 			//Copy elite members
 			for (int i = 0; i < Settings.ElitismCutoff; i ++)
 				NewPool[i] = Pool[i];
-
-			NewPoolIndex = Settings.ElitismCutoff;
-
-		float CrossoverAmount = Settings.CrossoverAmount;
 
 			//Tweak crossover rate to improve final convergence
 			if (Settings.DynamicCrossoverAmount)
@@ -363,9 +375,6 @@ namespace Mastermind
 						NewColorA[i] = ColorB[i];
 						NewColorB[i] = ColorA[i];
 					}
-
-					NewPool[NewPoolIndex].Row = new RowState(NewColorA);
-					NewPool[NewPoolIndex + 1].Row = new RowState(NewColorB);
 				}
 				else //Random crossover
 				{
@@ -382,10 +391,10 @@ namespace Mastermind
 
 					Array.Copy(ShuffleColor, 0, NewColorA, 0, Columns);
 					Array.Copy(ShuffleColor, Columns, NewColorB, 0, Columns);
-
-					NewPool[NewPoolIndex].Row = new RowState(NewColorA);
-					NewPool[NewPoolIndex + 1].Row = new RowState(NewColorB);
 				}
+
+				NewPool[NewPoolIndex] = new PoolMember(new RowState(NewColorA), 0);
+				NewPool[NewPoolIndex + 1] = new PoolMember(new RowState(NewColorB), 0);
 			}
 
 			float MutationRate = Settings.MutationRate;
@@ -415,7 +424,7 @@ namespace Mastermind
 
 				for (int i = 0; i < Math.Max((int)Math.Round(Columns * MutationRate), 1); i ++)
 				{
-					int Column = 0;
+					int Column;
 
 					do
 					{
@@ -427,10 +436,12 @@ namespace Mastermind
 					NewColorA[Column] = (byte)Generator.Next(Board.NumColors);
 				}
 
-				NewPool[NewPoolIndex].Row = new RowState(NewColorA);
+				NewPool[NewPoolIndex] = new PoolMember(new RowState(NewColorA), 0);
 			}
 
+			var OldPool = Pool;
 			Pool = NewPool;
+			NewPool = OldPool;
 		}
 
 		private void UpdateMessage(PoolMember BestGuess, int Generation)
@@ -466,7 +477,13 @@ namespace Mastermind
 				return SeedGuess.GetGuess(Board);
 
 			if (Pool == null)
+			{
 				GeneratePool(Board);
+
+				//Used by CompareRows to avoid excessive heap allocations
+				RowColumnMatched = new bool[Board.NumColumns];
+				GuessColumnMatched = new bool[Board.NumColumns];
+			}
 
 			//Perform pool evolution
 			Evolve(Board);
@@ -505,8 +522,8 @@ namespace Mastermind
 		public void Reset()
 		{
 			Pool = null;
+			NewPool = null;
 			AbortProcessing = false;
-			GC.Collect();
 		}
 
 		/// <see cref="Solver.Abort"/>

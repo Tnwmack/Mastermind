@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="GeneticSolverTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SortTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomTypes\CustomTypes.csproj">

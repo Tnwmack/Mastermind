@@ -102,7 +102,6 @@ namespace Mastermind
 
 				NewArr.CopyTo(arr, 0);
 				NewArr = null;
-				GC.Collect();
 			}
 			else
 			{

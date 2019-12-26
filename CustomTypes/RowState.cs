@@ -13,7 +13,7 @@ namespace Mastermind
 	/// </summary>
 	public struct RowState
 	{
-		private byte[] Colors;
+		private readonly ReadOnlyCollection<byte> Colors;
 
 		/// <summary>
 		/// Creates a new row state
@@ -21,8 +21,7 @@ namespace Mastermind
 		/// <param name="InitColors">The colors to use for the row</param>
 		public RowState(params byte[] InitColors)
 		{
-			Colors = new byte[InitColors.Length];
-			Array.Copy(InitColors, Colors, InitColors.Length);
+			Colors = Array.AsReadOnly((byte[])InitColors.Clone());
 		}
 
 		/// <summary>
@@ -34,13 +33,12 @@ namespace Mastermind
 		/// <returns>The random row</returns>
 		public static RowState GetRandomColors(Random RandGenerator, int NumColors, int NumColumns)
 		{
-		RowState NewState = new RowState();
-			NewState.Colors = new byte[NumColumns];
+			var NewColors = new byte[NumColumns];
 
 			for (int i = 0; i < NumColumns; i ++)
-				NewState.Colors[i] = (byte)RandGenerator.Next(0, NumColors);
+				NewColors[i] = (byte)RandGenerator.Next(0, NumColors);
 
-			return NewState;
+			return new RowState(NewColors);
 		}
 
 		/// <summary>
@@ -70,11 +68,11 @@ namespace Mastermind
 		{
 		StringBuilder SB = new StringBuilder();
 
-			for(int i = 0; i < Colors.Length; i ++)
+			for(int i = 0; i < Colors.Count; i ++)
 			{
 				SB.Append(Colors[i].ToString());
 
-				if (i + 1 != Colors.Length)
+				if (i + 1 != Colors.Count)
 					SB.Append(" ");
 			}
 
@@ -96,7 +94,7 @@ namespace Mastermind
 		/// </summary>
 		public int Length
 		{
-			get { return Colors.Length; }
+			get { return Colors.Count; }
 		}
 
 		/// <see cref="System.Object.Equals(object)"/>
@@ -119,7 +117,7 @@ namespace Mastermind
 
 		RowState B = (RowState)obj;
 
-			for (int i = 0; i < Colors.Length; i ++)
+			for (int i = 0; i < Colors.Count; i ++)
 			{
 				if (Colors[i] != B.Colors[i])
 					return false;
