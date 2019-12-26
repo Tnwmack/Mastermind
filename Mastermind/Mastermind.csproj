@@ -97,6 +97,7 @@
     </Compile>
     <Compile Include="ColorMapper.cs" />
     <Compile Include="GeneticAlgorithm.cs" />
+    <Compile Include="IGeneticItem.cs" />
     <Compile Include="GeneticSettings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -105,6 +106,7 @@
     </Compile>
     <Compile Include="GeneticSolver.cs" />
     <Compile Include="HybridSolver.cs" />
+    <Compile Include="IGeneticItemFactory.cs" />
     <Compile Include="KnuthSettings.cs">
       <SubType>Form</SubType>
     </Compile>
