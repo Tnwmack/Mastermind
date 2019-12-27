@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mastermind
 {
-	class GeneticAlgorithm<T, F> where T : IGeneticItem where F : IGeneticItemFactory<T>
+	public class GeneticAlgorithm<T, F> where T : IGeneticItem, ICloneable where F : IGeneticItemFactory<T>
 	{
 		public struct PoolMember : IComparable<PoolMember>
 		{
@@ -15,7 +12,7 @@ namespace Mastermind
 
 			public PoolMember(T Item, int Score)
 			{
-				this.Item = Item;
+				this.Item = (T)Item.Clone();
 				this.Score = Score;
 			}
 
@@ -28,7 +25,7 @@ namespace Mastermind
 		public PoolMember[] Pool;
 		private PoolMember[] NewPool;
 
-		private readonly Random Generator = new Random();
+		protected readonly Random Generator = new Random();
 
 		protected readonly F PoolItemFactory;
 
@@ -42,7 +39,7 @@ namespace Mastermind
 			Pool = new PoolMember[Size];
 			NewPool = new PoolMember[Size];
 
-			for(int i = 0; i < Pool.Length; i ++)
+			for (int i = 0; i < Pool.Length; i ++)
 			{
 				Pool[i] = new PoolMember(PoolItemFactory.GetRandom(), 0);
 			}
@@ -64,7 +61,7 @@ namespace Mastermind
 			Array.Sort(Pool);
 		}
 
-		public int SelectParentWeighted(int MaxIndexInclusive)
+		public int SelectIndexWeighted(int MaxIndexInclusive)
 		{
 			//Linear falloff probability where:
 			//P(x) = -1*x + 1
@@ -79,59 +76,60 @@ namespace Mastermind
 			return Result;
 		}
 
-		public int SelectParentRandom(int MaxIndexInclusive)
+		public int SelectIndexWeighted(int MinimumIndexInclusive, int MaxIndexInclusive)
 		{
-			//Linear falloff probability where:
-			//P(x) = -1*x + 1
-			//CDF(X) = -(1/2)x^2 + x = y
-			//X = 1 - (1 - 2*y)^(1/2)
-
-			return (int)Math.Floor(Generator.NextDouble() * MaxIndexInclusive);
+			return SelectIndexWeighted(MaxIndexInclusive - MinimumIndexInclusive) + MinimumIndexInclusive;
 		}
 
 		public void Evolve(int ElitismCutoff, double CrossoverChance, double MutationChance)
 		{
+			//TODO: Add multiple parent option and crossover fitness heuristic
+
 			int NewPoolIndex = 0;
 
 			//Direct copy top members
-			for(int i = 0; i < ElitismCutoff; i ++)
+			for(int i = 0; i < ElitismCutoff && NewPoolIndex < Pool.Length; i ++)
 			{
 				NewPool[NewPoolIndex ++] = new PoolMember(Pool[i].Item, 0);
 			}
 
-			//Perform crossovers and mutations
-			for(int i = 0; i < Pool.Length && NewPoolIndex < Pool.Length; i ++)
+			int NumCrossovers = (int)((Pool.Length - ElitismCutoff) * CrossoverChance) / 2;
+
+			//Perform crossovers
+			for (int i = 0; i < NumCrossovers && NewPoolIndex < Pool.Length; i++)
 			{
-				if(Generator.NextDouble() < CrossoverChance && 
-					i + 1 < Pool.Length &&
-					NewPoolIndex + 1 < Pool.Length)
+				T ParentA = Pool[SelectIndexWeighted(Pool.Length - 1)].Item;
+				T ParentB = Pool[SelectIndexWeighted(Pool.Length - 1)].Item;
+
+				if (Generator.NextDouble() <= MutationChance)
 				{
-					T ParentA = Pool[i].Item;
-					T ParentB = Pool[i + 1].Item;
+					ParentA = PoolItemFactory.Mutate(ParentA);
+					ParentB = PoolItemFactory.Mutate(ParentB);
+				}
 
-					if (Generator.NextDouble() < MutationChance)
-					{
-						ParentA = PoolItemFactory.Mutate(Pool[i].Item);
-						ParentB = PoolItemFactory.Mutate(Pool[i + 1].Item);
-					}
+				T NewItemA, NewItemB;
+				PoolItemFactory.Cross(ParentA, ParentB, out NewItemA, out NewItemB);
 
-					T NewItemA, NewItemB;
-					PoolItemFactory.Cross(ParentA, ParentB, out NewItemA, out NewItemB);
+				NewPool[NewPoolIndex++] = new PoolMember(NewItemA, 0);
+				NewPool[NewPoolIndex++] = new PoolMember(NewItemB, 0);
+			}
 
-					NewPool[NewPoolIndex++] = new PoolMember(NewItemA, 0);
-					NewPool[NewPoolIndex++] = new PoolMember(NewItemB, 0);
+			//Perform copies
+			while (NewPoolIndex < Pool.Length)
+			{
+				T Item;
+
+				if (Generator.NextDouble() <= MutationChance)
+				{
+					Item = Pool[SelectIndexWeighted(Pool.Length - 1)].Item;
+					Item = PoolItemFactory.Mutate(Item);
 				}
 				else
 				{
-					T Item = Pool[i].Item;
-
-					if (Generator.NextDouble() < MutationChance)
-					{
-						Item = PoolItemFactory.Mutate(Item);
-					}
-					
-					NewPool[NewPoolIndex++] = new PoolMember(Item, 0);
+					Item = Pool[SelectIndexWeighted(ElitismCutoff, Pool.Length - 1)].Item;
 				}
+				
+				NewPool[NewPoolIndex++] = new PoolMember(Item, 0);
 			}
 
 			var OldPool = Pool;

@@ -86,8 +86,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AVLTree.cs" />
-    <Compile Include="BinaryTree.cs" />
     <Compile Include="BoardSettings.cs" />
     <Compile Include="BoardSettingsForm.cs">
       <SubType>Form</SubType>

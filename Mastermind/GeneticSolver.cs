@@ -109,7 +109,7 @@ namespace Mastermind
 
 		}
 
-		public class Guess : IGeneticItem
+		public class Guess : IGeneticItem, ICloneable
 		{
 			private readonly GameBoard Board;
 			private readonly int MatchScore;
@@ -201,6 +201,11 @@ namespace Mastermind
 			public int GetScore()
 			{
 				return EvalRow();
+			}
+
+			public object Clone()
+			{
+				return new Guess(Board, MatchScore, PartialMatchScore, GuessState);
 			}
 		}
 
@@ -311,12 +316,15 @@ namespace Mastermind
 			Solver.ScoreAndSortPool();
 
 			//Keep evolving until a possible solution is found (with at least one generation), or a max number of generations have occurred
-			for(int i = 0; i < Settings.MaxGenerations && Solver.Pool[0].Score != 0 && !AbortProcessing; i ++)
+
+			int Generation = 0;
+			do
 			{
 				Solver.Evolve(Settings.ElitismCutoff, Settings.CrossoverAmount, Settings.MutationRate);
 				Solver.ScoreAndSortPool();
-				UpdateMessage(i + 1);
-			}
+				UpdateMessage(Generation + 1);
+				Generation++;
+			} while (Generation < Settings.MaxGenerations && Solver.Pool[0].Score != 0 && !AbortProcessing);
 		}
 
 		/// <see cref="Solver.GetGuess(GameBoard)"/>
