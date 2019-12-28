@@ -11,9 +11,9 @@ namespace Mastermind
 	/// </summary>
 	public class GameBoard
 	{
-		private int numColors;
-		private int numColumns;
-		private int numRows;
+		private readonly int numColors;
+		private readonly int numColumns;
+		private readonly int numRows;
 		//private int currentRow = 0;
 
 		/// <summary>
@@ -108,7 +108,7 @@ namespace Mastermind
 				}
 			}
 
-			//Math correct color
+			//Match correct color
 			for (int i = 0; i < State.Length; i++)
 			{
 				for (int j = 0; j < State.Length; j++)
