@@ -1,75 +1,150 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using NUnit.Framework;
 using Mastermind;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mastermind.Tests
+namespace MastermindTests
 {
-    [TestClass()]
-    public class GeneticSolverTests
-    {
-        [TestMethod()]
-        public void CompareRowsTest()
-        {
-			GeneticSolver.GeneticSolverSettings Settings = new GeneticSolver.GeneticSolverSettings();
-			GeneticSolver GS = new GeneticSolver();
-            PrivateObject GSpriv = new PrivateObject(GS);
+	public class GeneticSolverTests
+	{
+		class TestItem : IGeneticItem, ICloneable
+		{
+			public readonly int Score;
 
-            RowState Answer = new RowState(0, 1, 2, 3);
-            BoardRow Guess1 = new BoardRow(new RowState(1, 1, 1, 1), new RowScore(1, 0));
+			public TestItem(int Score)
+			{
+				this.Score = Score;
+			}
 
-            RowState CheckRow1 = new RowState(0, 1, 2, 3);
-            Assert.AreEqual(0, (int)GSpriv.Invoke("CompareRows", CheckRow1, Guess1));
+			public object Clone()
+			{
+				return new TestItem(Score);
+			}
 
-			RowState CheckRow2 = new RowState(1, 1, 2, 2);
-			Assert.AreEqual(-Settings.MatchScore, (int)GSpriv.Invoke("CompareRows", CheckRow2, Guess1));
-
-			BoardRow Guess2 = new BoardRow(new RowState(3, 2, 1, 1), new RowScore(0, 3));
-
-			Assert.AreEqual(0, (int)GSpriv.Invoke("CompareRows", CheckRow1, Guess2));
-			Assert.AreEqual(0, (int)GSpriv.Invoke("CompareRows", CheckRow2, Guess2));
-
-			RowState CheckRow3 = new RowState(1, 1, 2, 3);
-			Assert.AreEqual(-Settings.PartialMatchScore, (int)GSpriv.Invoke("CompareRows", CheckRow3, Guess2));
+			public int GetScore()
+			{
+				return Score;
+			}
 		}
 
-		[TestMethod()]
-		public void SelectParentTest()
+		class TestItemFactory : IGeneticItemFactory<TestItem>
 		{
-			GeneticSolver.GeneticSolverSettings Settings = new GeneticSolver.GeneticSolverSettings();
-			GeneticSolver GS = new GeneticSolver();
-			PrivateObject GSpriv = new PrivateObject(GS);
-			GameBoard GB = new GameBoard(5, 4, 10, new RowState(new byte[] { 0, 1, 2, 3 }));
-			GS.GeneratePool(GB);
+			public int Score = 0;
+			public int Crosses = 0;
+			public int Mutations = 0;
 
-			Console.WriteLine("\r\nTest counts:");
-
-			int[] SelectCounts = new int[Settings.PoolSize / 10];
-
-			for(int i = 0; i < Settings.PoolSize * 1000; i ++)
+			public void Cross(TestItem A, TestItem B, out TestItem ResultA, out TestItem ResultB)
 			{
-				int index = (int)GSpriv.Invoke("SelectParent", Settings.PoolSize);
-				Assert.IsTrue(index >= 0);
-				Assert.IsTrue(index < Settings.PoolSize);
-				SelectCounts[index / 10]++;
+				ResultA = new TestItem(0);
+				ResultB = new TestItem(0);
+				Crosses++;
 			}
 
-			for(int i = 0; i < Settings.PoolSize / 10; i ++)
+			public TestItem GetRandom()
 			{
-				Console.Write((i * 10).ToString() + ",");
+				return new TestItem(Score++);
 			}
 
-			Console.Write("\r\n");
-
-			for (int i = 0; i < Settings.PoolSize / 10; i++)
+			public TestItem Mutate(TestItem Item)
 			{
-				Console.Write(SelectCounts[i] + ",");
+				Mutations++;
+				return new TestItem(0);
+			}
+		}
+
+		private class GeneticAlgorithmTest : GeneticAlgorithm<TestItem, TestItemFactory>
+		{
+			protected new Random Generator = new Random(10);
+
+			public GeneticAlgorithmTest(TestItemFactory PoolItemFactory) : base(PoolItemFactory)
+			{
+			}
+		}
+
+		void Shuffle<T>(T[] Arr)
+		{
+			Random Gen = new Random();
+
+			for (int i = 0; i < Arr.Length * 10; i++)
+			{
+				int IndexA = Gen.Next(Arr.Length);
+				int IndexB = Gen.Next(Arr.Length);
+
+				T Temp = Arr[IndexA];
+				Arr[IndexA] = Arr[IndexB];
+				Arr[IndexB] = Temp;
+			}
+		}
+
+		[SetUp]
+		public void Setup()
+		{
+		}
+
+		[Test]
+		public void TestGeneticAlgorithm()
+		{
+			int PoolSize = 100;
+
+			//Test pool generation and sorting
+			TestItemFactory Factory = new TestItemFactory();
+			GeneticAlgorithmTest Test = new GeneticAlgorithmTest(Factory);
+
+			Test.GeneratePool(PoolSize);
+			Shuffle(Test.Pool);
+			Test.ScoreAndSortPool();
+
+			for (int i = 0; i < PoolSize; i++)
+			{
+				Assert.IsTrue(Test.Pool[i].Score == PoolSize - 1 - i);
 			}
 
-			Console.Write("\r\n");
+			//Test index selection
+			//Check Indices distribution in debugger
+			int[] Indices = new int[100];
+
+			for (int i = 0; i < 20000000; i++)
+			{
+				Indices[Test.SelectIndexWeighted(Indices.Length - 1)]++;
+			}
+
+			Console.WriteLine("Indices[0]: {0}", Indices[0]);
+			Console.WriteLine("Indices[25]: {0}", Indices[25]);
+			Console.WriteLine("Indices[50]: {0}", Indices[50]);
+			Console.WriteLine("Indices[75]: {0}", Indices[75]);
+			Console.WriteLine("Indices[99]: {0}", Indices[99]);
+
+			//Test evolutions
+
+			PoolSize = 500;
+			int Elites = 15;
+			double Crosses = 0.5;
+			double Mutations = 0.1;
+
+			Factory.Score = 0;
+			Test.GeneratePool(PoolSize);
+			Shuffle(Test.Pool);
+			Test.ScoreAndSortPool();
+
+			for (int i = 0; i < Elites; i++)
+			{
+				Assert.IsTrue(Test.Pool[i].Score == PoolSize - 1 - i);
+			}
+
+			Test.Evolve(Elites, Crosses, Mutations);
+			Test.ScoreAndSortPool();
+
+			for (int i = 0; i < Elites; i++)
+			{
+				Assert.IsTrue(Test.Pool[i].Score == PoolSize - 1 - i);
+			}
+
+			for (int i = 0; i < PoolSize - 1; i++)
+			{
+				Assert.IsTrue(Test.Pool[i].Score >= Test.Pool[i + 1].Score);
+			}
+
+			Console.WriteLine("Crosses {3:P0} n={0}: {1} ({2} expected)", PoolSize, Factory.Crosses, (int)((PoolSize - Elites) * Crosses / 2.0), Crosses);
+			Console.WriteLine("Mutations {3:P0} n={0}: {1} ({2} expected)", PoolSize, Factory.Mutations, (int)((PoolSize - Elites) * Mutations), Mutations);
 		}
 	}
 }

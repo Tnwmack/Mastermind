@@ -14,6 +14,9 @@ namespace Mastermind
 		[STAThread]
 		static void Main()
 		{
+#if NETCOREAPP3_1
+			Application.SetHighDpiMode(HighDpiMode.SystemAware);
+#endif
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainMenu());
