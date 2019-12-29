@@ -34,7 +34,7 @@ namespace Mastermind
 			/// <summary>
 			/// The rate that colors are mutated (columns*MutationRate) mutations
 			/// </summary>
-			public float MutationRate = 0.25f;
+			public float MutationRate = 0.05f;
 
 			/// <summary>
 			/// The number top scoring pool members that do not 
@@ -55,27 +55,7 @@ namespace Mastermind
 			/// <summary>
 			/// The maximum number of generations before forcing a guess
 			/// </summary>
-			public int MaxGenerations = 200;
-
-			/// <summary>
-			/// Linear crossover function is used if true, random if false
-			/// </summary>
-			public bool LinearCrossover = true;
-
-			/// <summary>
-			/// Varies the crossover amount based on certain criteria. CrossoverAmount is ignored.
-			/// </summary>
-			public bool DynamicCrossoverAmount = false;
-
-			/// <summary>
-			/// Varies the mutation rate based on certain criteria. MutationRate is ignored.
-			/// </summary>
-			public bool DynamicMutationRate = true;
-
-			/// <summary>
-			/// Pool members with less than this score are eliminated, 0 to disable.
-			/// </summary>
-			public int ScoreCutoff = -500;
+			public int MaxGenerations = 40;
 
 			/// <see cref="ICloneable.Clone"/>
 			public object Clone()
@@ -88,18 +68,13 @@ namespace Mastermind
 					ElitismCutoff = ElitismCutoff,
 					MatchScore = MatchScore,
 					PartialMatchScore = PartialMatchScore,
-					MaxGenerations = MaxGenerations,
-					LinearCrossover = LinearCrossover,
-					DynamicCrossoverAmount = DynamicCrossoverAmount,
-					DynamicMutationRate = DynamicMutationRate,
-					ScoreCutoff = ScoreCutoff
+					MaxGenerations = MaxGenerations
 				};
 			}
 		}
 
 		//Tuning parameters
 		private GeneticSolverSettings Settings = new GeneticSolverSettings();
-
 
 		/// <summary>
 		/// Genetic solver constructor
@@ -360,9 +335,8 @@ namespace Mastermind
 		/// <see cref="Solver.ShowSettingsDialog"/>
 		public void ShowSettingsDialog()
 		{
-			using (GeneticSettings SettDlg = new GeneticSettings())
+			using (GeneticSettings SettDlg = new GeneticSettings((GeneticSolverSettings)Settings.Clone()))
 			{
-				SettDlg.Settings = (GeneticSolverSettings)Settings.Clone();
 				System.Windows.Forms.DialogResult Res = SettDlg.ShowDialog();
 
 				if (Res == System.Windows.Forms.DialogResult.OK)
