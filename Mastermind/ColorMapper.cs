@@ -39,7 +39,7 @@ namespace Mastermind
 
 		public Brush GetBrush(int ColorID)
 		{
-			if (ColorID < Brushes.Length)
+			if (ColorID >= 0 && ColorID < Brushes.Length)
 				return Brushes[ColorID];
 
 			return Brushes[Brushes.Length - 1];

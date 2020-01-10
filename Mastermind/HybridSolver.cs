@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Mastermind
 {
-	class HybridSolver : Solver
+	class HybridSolver : ISolver
 	{
-		public event Action<string> SetMessage;
+		public event Action<string> OnStatusChange;
 		private Action<string> OnSetMessageDelegate; 
 
 		private GeneticSolver GSolver = new GeneticSolver();
@@ -21,7 +21,7 @@ namespace Mastermind
 			OnSetMessageDelegate = new Action<string>(OnSetMessage);
 		}
 
-		/// <see cref="Solver.GetGuess(GameBoard)"/>
+		/// <see cref="ISolver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
 		{
 			if(Board.Guesses.Count == 0)
@@ -34,8 +34,8 @@ namespace Mastermind
 			{
 				InGeneticMode = false;
 				GSolver.Reset();
-				GSolver.SetMessage -= OnSetMessageDelegate;
-				KSolver.SetMessage += OnSetMessageDelegate;
+				GSolver.OnStatusChange -= OnSetMessageDelegate;
+				KSolver.OnStatusChange += OnSetMessageDelegate;
 			}
 
 			if(InGeneticMode)
@@ -52,27 +52,27 @@ namespace Mastermind
 		{
 			if(InGeneticMode)
 			{
-				SetMessage?.Invoke("Genetic Mode: " + Message);
+				OnStatusChange?.Invoke("Genetic Mode: " + Message);
 			}
 			else
 			{
-				SetMessage?.Invoke("Knuth Mode: " + Message);
+				OnStatusChange?.Invoke("Knuth Mode: " + Message);
 			}
 		}
 
-		/// <see cref="Solver.Reset"/>
+		/// <see cref="ISolver.Reset"/>
 		public void Reset()
 		{
 			GSolver.Reset();
 			KSolver.Reset();
 
 			InGeneticMode = true;
-			KSolver.SetMessage -= OnSetMessageDelegate;
-			GSolver.SetMessage -= OnSetMessageDelegate;
-			GSolver.SetMessage += OnSetMessageDelegate;
+			KSolver.OnStatusChange -= OnSetMessageDelegate;
+			GSolver.OnStatusChange -= OnSetMessageDelegate;
+			GSolver.OnStatusChange += OnSetMessageDelegate;
 		}
 
-		/// <see cref="Solver.Abort"/>
+		/// <see cref="ISolver.Abort"/>
 		public void Abort()
 		{
 			if (InGeneticMode)
@@ -85,7 +85,7 @@ namespace Mastermind
 			}
 		}
 
-		/// <see cref="Solver.ShowSettingsDialog"/>
+		/// <see cref="ISolver.ShowSettingsDialog"/>
 		public void ShowSettingsDialog()
 		{
 			//TODO: Does this make sense? Maybe make a new dlg

@@ -6,31 +6,31 @@ namespace Mastermind
 	/// <summary>
 	/// Generates totally random guesses, mainly used for testing
 	/// </summary>
-	class RandomSolver : Solver
+	class RandomSolver : ISolver
 	{
-		public event Action<string> SetMessage;
+		public event Action<string> OnStatusChange;
 		private Random Generator = new Random();
 
-		/// <see cref="Solver.GetGuess"/>
+		/// <see cref="ISolver.GetGuess"/>
 		public RowState GetGuess(GameBoard Board)
 		{
 			return RowState.GetRandomColors(Generator, Board.NumColors, Board.NumColumns);
 		}
 
-		/// <see cref="Solver.ShowSettingsDialog"/>
+		/// <see cref="ISolver.ShowSettingsDialog"/>
 		public void ShowSettingsDialog()
 		{
 			MessageBox.Show("No settings for this solver.", "Random Guess", 
 				MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 
-		/// <see cref="Solver.Reset"/>
+		/// <see cref="ISolver.Reset"/>
 		public void Reset()
 		{
 
 		}
 
-		/// <see cref="Solver.Abort"/>
+		/// <see cref="ISolver.Abort"/>
 		public void Abort()
 		{
 

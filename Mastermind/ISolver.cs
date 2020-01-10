@@ -9,7 +9,7 @@ namespace Mastermind
 	/// <summary>
 	/// This interface is implemented by game solvers
 	/// </summary>
-	interface Solver
+	interface ISolver
 	{
 		/// <summary>
 		/// Gets a new guess for the game
@@ -36,6 +36,6 @@ namespace Mastermind
 		/// <summary>
 		/// Gets a status message to display to the user
 		/// </summary>
-		event Action<string> SetMessage;
+		event Action<string> OnStatusChange;
 	}
 }

@@ -62,6 +62,11 @@
 			// IterationNumeric
 			// 
 			this.IterationNumeric.Location = new System.Drawing.Point(121, 12);
+			this.IterationNumeric.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
 			this.IterationNumeric.Name = "IterationNumeric";
 			this.IterationNumeric.Size = new System.Drawing.Size(65, 20);
 			this.IterationNumeric.TabIndex = 2;

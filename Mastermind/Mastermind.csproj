@@ -8,12 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CustomControlsLibrary\CustomControlsLibrary.csproj" />
-    <ProjectReference Include="..\CustomTypes\CustomTypes.csproj" />
+    <Folder Include="Properties\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <ProjectReference Include="..\CustomControlsLibrary\CustomControlsLibrary.csproj" />
+    <ProjectReference Include="..\CustomTypes\CustomTypes.csproj" />
   </ItemGroup>
 
 </Project>

@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace Mastermind
 {
-	class KnuthSolver : Solver
+	class KnuthSolver : ISolver
 	{
-		public event Action<string> SetMessage;
+		public event Action<string> OnStatusChange;
 
 		private volatile bool AbortProcessing = false;
 
@@ -138,18 +138,19 @@ namespace Mastermind
 			else //intermediate case
 			{
 				//try each color in this column then recurse the next columns
-				for (int c = 0; c < Board.NumColors && !OOMTriggered; c++)
+				for (int c = 0; c < Board.NumColors && !OOMTriggered && !AbortProcessing; c++)
 				{
 					Colors[Column] = (byte)c;
 					
-					//Early esc test
+					//Early escape test
+					//Testing shows about a 50% performance boost by using the early escape
 					if(Column == Colors.Length / 2)
 					{
 						bool Consistent = true;
 
 						for (int r = 0; r < SeedRows; r++)
 						{
-							if (!EarlyIsConsistent(new RowState(Colors), Board.Guesses[r]))
+							if (!EarlyIsConsistent(new RowState(Colors), Board.Guesses[r], Column + 1))
 							{
 								Consistent = false;
 								break;
@@ -192,12 +193,11 @@ namespace Mastermind
 			return true;
 		}
 
-		private bool EarlyIsConsistent(RowState Colors, BoardRow Row)
+		private bool EarlyIsConsistent(RowState Colors, BoardRow Row, int Cutoff)
 		{
 		int SamePosAndColor = 0, SameColor = 0;
-		int UnknownFactor = (int)Math.Ceiling((double)Colors.Length / 2.0);
 
-			for (int i = 0; i < Colors.Length / 2; i ++)
+			for (int i = 0; i < Cutoff; i ++)
 			{
 				if (Colors[i] == Row.Row[i])
 				{
@@ -208,7 +208,8 @@ namespace Mastermind
 			if(SamePosAndColor > Row.Score.NumCorrectSpot)
 				return false;
 
-			bool[] Matched = new bool[Colors.Length];
+			//This section doesn't work, but may not be needed
+			/*bool[] Matched = new bool[Colors.Length];
 
 			for (int i = 0; i < Colors.Length / 2; i ++)
 			{
@@ -224,7 +225,7 @@ namespace Mastermind
 			}
 
 			if (SameColor - SamePosAndColor > Row.Score.NumCorrectColor)
-				return false;
+				return false;*/
 
 			return true;
 		}
@@ -322,7 +323,7 @@ namespace Mastermind
 		/// <returns>The possible answer to use</returns>
 		private RowState ChooseGuess()
 		{
-			System.Diagnostics.Debug.Assert(Pool.Count > 0);
+			System.Diagnostics.Debug.Assert(Pool.Count > 0, "Pool empty, solution not found");
 
 		//TODO: choose a better heuristic method
 		int Index = Generator.Next(Pool.Count);
@@ -330,7 +331,7 @@ namespace Mastermind
 			return Pool.ElementAt(Index);
 		}
 
-		/// <see cref="Solver.GetGuess(GameBoard)"/>
+		/// <see cref="ISolver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
 		{
 			//Use a seed guess
@@ -347,12 +348,12 @@ namespace Mastermind
 				Evolve(Board);
 			}
 
-			SetMessage?.Invoke("Pool Size: " + Pool.Count.ToString("##,#"));
+			OnStatusChange?.Invoke("Pool Size: " + Pool.Count.ToString("##,#"));
 
 			return ChooseGuess();
 		}
 
-		/// <see cref="Solver.Reset"/>
+		/// <see cref="ISolver.Reset"/>
 		public void Reset()
 		{
 			//Pool?.Clear();
@@ -361,13 +362,13 @@ namespace Mastermind
 			GC.Collect();
 		}
 
-		/// <see cref="Solver.Abort"/>
+		/// <see cref="ISolver.Abort"/>
 		public void Abort()
 		{
 			AbortProcessing = true;
 		}
 
-		/// <see cref="Solver.ShowSettingsDialog"/>
+		/// <see cref="ISolver.ShowSettingsDialog"/>
 		public void ShowSettingsDialog()
 		{
 			using (KnuthSettings SettDlg = new KnuthSettings())

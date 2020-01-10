@@ -16,6 +16,9 @@ namespace Mastermind
 		private readonly int numRows;
 		//private int currentRow = 0;
 
+		public Action<GameBoard> OnBoardChanged;
+		public Action<GameBoard> OnGameStateChanged;
+
 		/// <summary>
 		/// The currently selected answer key
 		/// </summary>
@@ -47,10 +50,21 @@ namespace Mastermind
 			Lost,
 		}
 
+		private GameState currentGameState = GameState.InProgress;
+
 		/// <summary>
 		/// The current state of the game
 		/// </summary>
-		public GameState CurrentGameState = GameState.InProgress;
+		public GameState CurrentGameState
+		{
+			get { return currentGameState; }
+
+			private set
+			{
+				currentGameState = value;
+				OnGameStateChanged?.Invoke(this);
+			}
+		}
 
 		/// <summary>
 		/// The number of colors in play
@@ -145,6 +159,7 @@ namespace Mastermind
 			NewRow.Score = ScoreRow(Guess, Answer);
 
 			Guesses.Add(NewRow);
+			OnBoardChanged?.Invoke(this);
 
 			if (NewRow.Score.NumCorrectSpot == NumColumns)
 			{
@@ -158,6 +173,13 @@ namespace Mastermind
 			}
 
 			return true;
+		}
+
+		public void Reset()
+		{
+			Guesses.Clear();
+			CurrentGameState = GameState.InProgress;
+			OnBoardChanged?.Invoke(this);
 		}
 
 	}

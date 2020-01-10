@@ -155,7 +155,7 @@ namespace CustomControlsLibrary
 
 			Invalidate();
 
-			OnAnswerChanged?.Invoke(new RowState(ColumnColors));
+			OnAnswerChanged?.Invoke(CurrentAnswer);
 		}
 	}
 }

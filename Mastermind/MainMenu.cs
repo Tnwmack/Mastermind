@@ -15,16 +15,10 @@ namespace Mastermind
 	/// </summary>
 	public partial class MainMenu : Form
 	{
-		private BoardSettings Settings = new BoardSettings();
-		private Solver AI;
-
 		private Game Master;
-
 		private ColorMapper Colors = new ColorMapper();
 
 		private volatile bool GuessThreadWorking = false;
-
-		private Action<string> OnSetMessageDelegate;
 
 		/// <summary>
 		/// Creates the main form of the program
@@ -33,32 +27,77 @@ namespace Mastermind
 		{
 			InitializeComponent();
 
-			AITypeComboBox.SelectedIndex = 0;
-
 			GameBoardControl.Colors = Colors;
 			AnswerKeyControl.Colors = Colors;
 
-			AnswerKeyControl.SetAnswer(new RowState(new byte[Settings.Columns]));
-			AnswerKeyControl.NumColors = Settings.Colors;
+			Master = new Game();
+			Master.OnAIStatusChange += OnSetMessage;
 
-			OnSetMessageDelegate = new Action<string>(OnSetMessage);
+			AnswerKeyControl.NumColors = Master.Settings.Colors;
+			AnswerKeyControl.SetAnswer(new RowState(new byte[Master.Settings.Columns]));
+
+			AITypeComboBox.SelectedIndex = 0;
 		}
 
 		/// <summary>
 		/// Resets the global game state and sets up a new game.
 		/// </summary>
-		/// <param name="Answer">The answer to use for the new game.</param>
-		private void GenerateGame(RowState Answer)
+		private void GenerateGame()
 		{
-			AI.Reset();
-
-		GameBoard Board = new GameBoard(Settings.Colors, Settings.Columns, Settings.Rows, Answer);
-			Master = new Game(Board, AI);
+			Master.GenerateBoard(AnswerKeyControl.CurrentAnswer);
+			Master.Board.OnBoardChanged += OnBoardChanged;
+			Master.Board.OnGameStateChanged += OnGameStateChanged;
 
 			GameBoardControl.ResetBoard();
-			GameBoardControl.Columns = Settings.Columns;
+			GameBoardControl.Columns = Master.Settings.Columns;
 
 			UpdateGameState();
+		}
+
+		private void OnBoardChanged(GameBoard Sender)
+		{
+			if (Sender.Guesses.Count > 0)
+				GameBoardControl.AddRow(Sender.Guesses.Last());
+			else
+				GameBoardControl.ResetBoard();
+		}
+
+		private void OnGameStateChanged(GameBoard Sender)
+		{
+			UpdateGameState();
+		}
+
+		/// <summary>
+		/// Updates the game state label.
+		/// </summary>
+		private void UpdateGameState()
+		{
+			if (GameStateLabel.InvokeRequired)
+			{
+				GameStateLabel.Invoke(new Action(UpdateGameState));
+				return;
+			}
+
+			switch (Master.Board.CurrentGameState)
+			{
+				case GameBoard.GameState.InProgress:
+					GameStateLabel.Font = new Font("Microsoft Sans Serif", 8.0f, FontStyle.Regular, GraphicsUnit.Point);
+					GameStateLabel.ForeColor = SystemColors.ControlText;
+					GameStateLabel.Text = "Game In Progress";
+					break;
+
+				case GameBoard.GameState.Won:
+					GameStateLabel.Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold, GraphicsUnit.Point);
+					GameStateLabel.ForeColor = Color.Green;
+					GameStateLabel.Text = "Game Won!";
+					break;
+
+				case GameBoard.GameState.Lost:
+					GameStateLabel.Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold, GraphicsUnit.Point);
+					GameStateLabel.ForeColor = Color.DarkRed;
+					GameStateLabel.Text = "Game Lost!";
+					break;
+			}
 		}
 
 		/// <see cref="Form.OnLoad(EventArgs)"/>
@@ -79,25 +118,24 @@ namespace Mastermind
 			switch(AITypeComboBox.SelectedIndex)
 			{
 				case 0:
-					AI = new KnuthSolver();
+					Master.SetAI(Game.SolverType.Knuth);
 					break;
 
 				case 1:
-					AI = new GeneticSolver();
+					Master.SetAI(Game.SolverType.Genetic);
 					break;
 
 				case 2:
-					AI = new HybridSolver();
+					Master.SetAI(Game.SolverType.Hybrid);
 					break;
 
 				case 3:
-					AI = new RandomSolver();
+					Master.SetAI(Game.SolverType.Random);
 					break;
-			}
 
-			AI.SetMessage -= OnSetMessageDelegate;
-			AI.SetMessage += OnSetMessageDelegate;
-			GenerateGame(AnswerKeyControl.CurrentAnswer);
+				default:
+					return;
+			}
 		}
 
 		public void OnSetMessage(string Message)
@@ -115,7 +153,7 @@ namespace Mastermind
 			if (GuessThreadWorking)
 				return;
 
-			Master.AI.ShowSettingsDialog();
+			Master.ShowAISettingsDialog();
 		}
 
 		/// <summary>
@@ -123,22 +161,19 @@ namespace Mastermind
 		/// </summary>
 		private void GetGuess()
 		{
-			GuessThreadWorking = true;
-
-			RowState? RS = Master.GenerateGuess();
-
-			this.Invoke((Action) delegate { 
-				this.Cursor = Cursors.Default;
-
-				if (RS != null)
-				{
-					GameBoardControl.AddRow(Master.Board.Guesses.Last());
-				}
-
-				UpdateGameState();
+			this.Invoke((Action)delegate {
+				this.Cursor = Cursors.WaitCursor;
 			});
 
+			GuessThreadWorking = true;
+
+			Master.AddGuessFromAI();
+
 			GuessThreadWorking = false;
+
+			this.Invoke((Action)delegate {
+				this.Cursor = Cursors.Default;
+			});
 		}
 
 		/// <summary>
@@ -151,39 +186,9 @@ namespace Mastermind
 			if (GuessThreadWorking)
 				return;
 
-			this.Cursor = Cursors.WaitCursor;
-
 		System.Threading.Thread GuessThread = new System.Threading.Thread(new System.Threading.ThreadStart(GetGuess));
 
 			GuessThread.Start();
-		}
-
-		/// <summary>
-		/// Updates the game state label.
-		/// </summary>
-		private void UpdateGameState()
-		{
-			switch(Master.Board.CurrentGameState)
-			{
-				case GameBoard.GameState.InProgress:
-					GameStateLabel.Font = new Font("Microsoft Sans Serif", 8.0f, FontStyle.Regular, GraphicsUnit.Point);
-					GameStateLabel.ForeColor = SystemColors.ControlText;
-					GameStateLabel.Text = "Game In Progress";
-					GameStateLabel.Invalidate();
-					break;
-
-				case GameBoard.GameState.Won:
-					GameStateLabel.Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold, GraphicsUnit.Point);
-					GameStateLabel.ForeColor = Color.Green;
-					GameStateLabel.Text = "Game Won!";
-					break;
-
-				case GameBoard.GameState.Lost:
-					GameStateLabel.Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold, GraphicsUnit.Point);
-					GameStateLabel.ForeColor = Color.DarkRed;
-					GameStateLabel.Text = "Game Lost!";
-					break;
-			}
 		}
 
 		/// <summary>
@@ -196,7 +201,7 @@ namespace Mastermind
 			if (GuessThreadWorking)
 				return;
 
-			GenerateGame(AnswerKeyControl.CurrentAnswer);
+			Master.Reset();
 		}
 
 		/// <summary>
@@ -209,16 +214,16 @@ namespace Mastermind
 			if (GuessThreadWorking)
 				return;
 
-		BoardSettingsForm SettForm = new BoardSettingsForm(Settings);
+		BoardSettingsForm SettForm = new BoardSettingsForm(Master.Settings);
 
 			if(SettForm.ShowDialog() == DialogResult.OK)
 			{
-				Settings = SettForm.Settings;
+				Master.SetBoardSettings((BoardSettings)SettForm.Settings.Clone());
 
-				AnswerKeyControl.SetAnswer(new RowState(new byte[Settings.Columns]));
-				AnswerKeyControl.NumColors = Settings.Colors;
+				AnswerKeyControl.SetAnswer(new RowState(new byte[Master.Settings.Columns]));
+				AnswerKeyControl.NumColors = Master.Settings.Colors;
 
-				GenerateGame(AnswerKeyControl.CurrentAnswer);
+				GenerateGame();
 			}
 		}
 
@@ -235,7 +240,7 @@ namespace Mastermind
 				return;
 			}
 
-			GenerateGame(NewAnswer);
+			GenerateGame();
 		}
 
 		/// <summary>
@@ -249,7 +254,6 @@ namespace Mastermind
 				return;
 
 			TestForm TestingForm = new TestForm();
-			//Events called in separate thread
 			TestingForm.OnRunClicked += TestingForm_OnRunClicked;
 			TestingForm.OnStopClicked += TestingForm_OnCancelClicked;
 
@@ -264,6 +268,7 @@ namespace Mastermind
 		/// <param name="Sender">The test form handle.</param>
 		private void TestingForm_OnCancelClicked(TestForm Sender)
 		{
+			Master?.AI.Abort();
 			CancelTesting = true;
 		}
 
@@ -272,7 +277,7 @@ namespace Mastermind
 		/// </summary>
 		/// <param name="Sender">The test form handle.</param>
 		/// <param name="Iterations">The number of runs to perform.</param>
-		private void TestingForm_OnRunClicked(TestForm Sender, int Iterations)
+		private async void TestingForm_OnRunClicked(TestForm Sender, int Iterations)
 		{
 			CancelTesting = false;
 			Random Rand = new Random();
@@ -284,35 +289,34 @@ namespace Mastermind
 
 			for (int i = 0; i < Iterations && !CancelTesting; i ++)
 			{
-				RowState Answer = RowState.GetRandomColors(Rand, Settings.Colors, Settings.Columns);
-				GameBoard Board = new GameBoard(Settings.Colors, Settings.Columns, Settings.Rows, Answer);
-				Game TestGame = new Game(Board, AI);
+				RowState Answer = RowState.GetRandomColors(Rand, Master.Settings.Colors, Master.Settings.Columns);
+				AnswerKeyControl.SetAnswer(Answer);
+
+				GenerateGame();
 
 				int GuessRow = 0;
 
 				Timer.Restart();
 
-				for (; GuessRow < Settings.Rows; GuessRow++)
+				while (Master.Board.CurrentGameState == GameBoard.GameState.InProgress)
 				{
-					TestGame.GenerateGuess();
-
-					if (TestGame.Board.CurrentGameState != GameBoard.GameState.InProgress)
-						break;
+					await Task.Run(new Action(GetGuess));
+					GuessRow++;
 				}
 				
 				Timer.Stop();
 
-				if (TestGame.Board.CurrentGameState == GameBoard.GameState.Lost)
+				if (Master.Board.CurrentGameState == GameBoard.GameState.Lost)
 				{
 					Failed++;
 				}
+				else
+				{
+					NumGuesses.Add(GuessRow);
+				}
 
-				NumGuesses.Add(GuessRow + 1);
 				ProcessTime.Add(Timer.Elapsed.TotalSeconds);
-
-				AI.Reset();
-
-				Sender.UpdateResults(i + 1, ProcessTime.Average(), NumGuesses.Average(), Failed);
+				Sender.UpdateResults(i + 1, ProcessTime.Average(), NumGuesses.Count > 0 ? NumGuesses.Average() : 0, Failed);
 			}
 
 			Sender.OnTestsCompleted();

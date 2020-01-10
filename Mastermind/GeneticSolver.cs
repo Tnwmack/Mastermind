@@ -9,9 +9,9 @@ namespace Mastermind
 	/// <summary>
 	/// A Mastermind solver that uses genetic algorithms.
 	/// </summary>
-	public class GeneticSolver : Solver
+	public class GeneticSolver : ISolver
 	{
-		public event Action<string> SetMessage;
+		public event Action<string> OnStatusChange;
 
 		private volatile bool AbortProcessing = false;
 
@@ -278,7 +278,7 @@ namespace Mastermind
 
 			int ElitePoolScore = (int)(PoolScore / Settings.ElitismCutoff);
 
-			SetMessage?.Invoke(string.Format("Best: {0}, Elite: {1}, Pool: {2}, Generations: {3}",
+			OnStatusChange?.Invoke(string.Format("Best: {0}, Elite: {1}, Pool: {2}, Generations: {3}",
 				Solver.Pool[0].Score, ElitePoolScore, AveragePoolScore, Generation));
 		}
 
@@ -302,7 +302,7 @@ namespace Mastermind
 			} while (Generation < Settings.MaxGenerations && Solver.Pool[0].Score != 0 && !AbortProcessing);
 		}
 
-		/// <see cref="Solver.GetGuess(GameBoard)"/>
+		/// <see cref="ISolver.GetGuess(GameBoard)"/>
 		public RowState GetGuess(GameBoard Board)
 		{
 			//Do a seed guess
@@ -332,7 +332,7 @@ namespace Mastermind
 			return new RowState(new byte[Board.NumColumns]);
 		}
 
-		/// <see cref="Solver.ShowSettingsDialog"/>
+		/// <see cref="ISolver.ShowSettingsDialog"/>
 		public void ShowSettingsDialog()
 		{
 			using (GeneticSettings SettDlg = new GeneticSettings((GeneticSolverSettings)Settings.Clone()))
@@ -347,14 +347,14 @@ namespace Mastermind
 			}
 		}
 
-		/// <see cref="Solver.Reset"/>
+		/// <see cref="ISolver.Reset"/>
 		public void Reset()
 		{
 			Solver = null;
 			AbortProcessing = false;
 		}
 
-		/// <see cref="Solver.Abort"/>
+		/// <see cref="ISolver.Abort"/>
 		public void Abort()
 		{
 			AbortProcessing = true;
