@@ -4,6 +4,11 @@
     <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
 	<UseWindowsForms>true</UseWindowsForms>
 	<Platforms>AnyCPU;x64</Platforms>
+	<LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net472|x64'">
+    <DocumentationFile>..\XMLDocs\CustomControlsLibrary.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mastermind
 {
@@ -81,7 +78,7 @@ namespace Mastermind
 					break;
 
 				default:
-					throw new ArgumentOutOfRangeException();
+					throw new ArgumentOutOfRangeException(nameof(Solver));
 			}
 
 			AI.OnStatusChange += AI_OnStatusChange;

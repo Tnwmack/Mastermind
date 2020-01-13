@@ -53,25 +53,10 @@ namespace MastermindTests
 
 		private class GeneticAlgorithmTest : GeneticAlgorithm<TestItem, TestItemFactory>
 		{
-			protected new Random Generator = new Random(10);
+			protected Random Generator = new Random(10);
 
 			public GeneticAlgorithmTest(TestItemFactory PoolItemFactory) : base(PoolItemFactory)
 			{
-			}
-		}
-
-		void Shuffle<T>(T[] Arr)
-		{
-			Random Gen = new Random();
-
-			for (int i = 0; i < Arr.Length * 10; i++)
-			{
-				int IndexA = Gen.Next(Arr.Length);
-				int IndexB = Gen.Next(Arr.Length);
-
-				T Temp = Arr[IndexA];
-				Arr[IndexA] = Arr[IndexB];
-				Arr[IndexB] = Temp;
 			}
 		}
 
@@ -90,12 +75,12 @@ namespace MastermindTests
 			GeneticAlgorithmTest Test = new GeneticAlgorithmTest(Factory);
 
 			Test.GeneratePool(PoolSize);
-			Shuffle(Test.Pool);
+			Test.ShufflePool();
 			Test.ScoreAndSortPool();
 
 			for (int i = 0; i < PoolSize; i++)
 			{
-				Assert.IsTrue(Test.Pool[i].Score == PoolSize - 1 - i);
+				Assert.IsTrue(Test.GetPoolItem(i).Score == PoolSize - 1 - i);
 			}
 
 			//Test index selection
@@ -122,12 +107,12 @@ namespace MastermindTests
 
 			Factory.Score = 0;
 			Test.GeneratePool(PoolSize);
-			Shuffle(Test.Pool);
+			Test.ShufflePool();
 			Test.ScoreAndSortPool();
 
 			for (int i = 0; i < Elites; i++)
 			{
-				Assert.IsTrue(Test.Pool[i].Score == PoolSize - 1 - i);
+				Assert.IsTrue(Test.GetPoolItem(i).Score == PoolSize - 1 - i);
 			}
 
 			Test.Evolve(Elites, Crosses, Mutations);
@@ -135,12 +120,12 @@ namespace MastermindTests
 
 			for (int i = 0; i < Elites; i++)
 			{
-				Assert.IsTrue(Test.Pool[i].Score == PoolSize - 1 - i);
+				Assert.IsTrue(Test.GetPoolItem(i).Score == PoolSize - 1 - i);
 			}
 
 			for (int i = 0; i < PoolSize - 1; i++)
 			{
-				Assert.IsTrue(Test.Pool[i].Score >= Test.Pool[i + 1].Score);
+				Assert.IsTrue(Test.GetPoolItem(i).Score >= Test.GetPoolItem(i + 1).Score);
 			}
 
 			Console.WriteLine("Crosses {3:P0} n={0}: {1} ({2} expected)", PoolSize, Factory.Crosses, (int)((PoolSize - Elites) * Crosses / 2.0), Crosses);

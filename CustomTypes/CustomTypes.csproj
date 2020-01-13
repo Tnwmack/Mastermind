@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
     <Platforms>AnyCPU;x64</Platforms>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net472|x64'">
+    <DocumentationFile>..\XMLDocs\CustomTypes.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,0 +1,974 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Mastermind</name>
+    </assembly>
+    <members>
+        <member name="T:Mastermind.BoardSettings">
+            <summary>
+            Contains the settings for the game board
+            </summary>
+        </member>
+        <member name="P:Mastermind.BoardSettings.Rows">
+            <summary>
+            The number of rows in the game
+            </summary>
+        </member>
+        <member name="P:Mastermind.BoardSettings.Columns">
+            <summary>
+            The number of columns in the game
+            </summary>
+        </member>
+        <member name="P:Mastermind.BoardSettings.Colors">
+            <summary>
+            The number of colors in the game
+            </summary>
+        </member>
+        <member name="M:Mastermind.BoardSettings.Clone">
+            <see cref="M:System.ICloneable.Clone"/>
+        </member>
+        <member name="T:Mastermind.BoardSettingsForm">
+            <summary>
+            Displays a modal settings dialog box for board settings
+            </summary>
+        </member>
+        <member name="P:Mastermind.BoardSettingsForm.Settings">
+            <summary>
+            The settings selected by the user
+            </summary>
+        </member>
+        <member name="M:Mastermind.BoardSettingsForm.#ctor(Mastermind.BoardSettings)">
+            <summary>
+            Creates a new settings dialog
+            </summary>
+            <param name="InitialSettings">The existing settings to fill the form with</param>
+        </member>
+        <member name="M:Mastermind.BoardSettingsForm.OKButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Confirms the new board settings.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Control.OnClick(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.BoardSettingsForm.CancelButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Dismisses the settings form.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Control.OnClick(System.EventArgs)"/></param>
+        </member>
+        <member name="F:Mastermind.BoardSettingsForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Mastermind.BoardSettingsForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Mastermind.BoardSettingsForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:Mastermind.Game.AddGuessFromAI">
+            <summary>
+            Make the AI generate a guess and add it to the board
+            </summary>
+            <returns>The guess added, or null if no guess could be made</returns>
+        </member>
+        <member name="M:Mastermind.Game.AI_OnStatusChange(System.String)">
+            <summary>
+            Rebroadcasts status messages from the AI solvers.
+            </summary>
+            <param name="Status">Status message</param>
+        </member>
+        <member name="T:Mastermind.GameBoard">
+            <summary>
+            Manages the game board
+            </summary>
+        </member>
+        <member name="E:Mastermind.GameBoard.OnBoardChanged">
+            <summary>
+            Called when the game board has changed (eg, a guess was added).
+            </summary>
+        </member>
+        <member name="E:Mastermind.GameBoard.OnGameStateChanged">
+            <summary>
+            Call when the game state has changed (eg, the game was won).
+            </summary>
+        </member>
+        <member name="P:Mastermind.GameBoard.Answer">
+            <summary>
+            The currently selected answer key
+            </summary>
+        </member>
+        <member name="P:Mastermind.GameBoard.Guesses">
+            <summary>
+            The entered guesses
+            </summary>
+        </member>
+        <member name="T:Mastermind.GameBoard.GameState">
+            <summary>
+            States the game can be in
+            </summary>
+        </member>
+        <member name="F:Mastermind.GameBoard.GameState.InProgress">
+            <summary>
+            Guesses can be entered
+            </summary>
+        </member>
+        <member name="F:Mastermind.GameBoard.GameState.Won">
+            <summary>
+            The game was won
+            </summary>
+        </member>
+        <member name="F:Mastermind.GameBoard.GameState.Lost">
+            <summary>
+            The game was lost
+            </summary>
+        </member>
+        <member name="P:Mastermind.GameBoard.CurrentGameState">
+            <summary>
+            The current state of the game
+            </summary>
+        </member>
+        <member name="P:Mastermind.GameBoard.NumColors">
+            <summary>
+            The number of colors in play
+            </summary>
+        </member>
+        <member name="P:Mastermind.GameBoard.NumColumns">
+            <summary>
+            The number of columns in play
+            </summary>
+        </member>
+        <member name="P:Mastermind.GameBoard.NumRows">
+            <summary>
+            The number of rows in play
+            </summary>
+        </member>
+        <member name="M:Mastermind.GameBoard.#ctor(System.Int32,System.Int32,System.Int32,Mastermind.RowState)">
+            <summary>
+            Gameboard constructor
+            </summary>
+            <param name="numColors">Number of colors used</param>
+            <param name="numColumns">Number of columns to use</param>
+            <param name="numRows">Number of rows in the game</param>
+            <param name="Answer">The answer to use</param>
+        </member>
+        <member name="M:Mastermind.GameBoard.ScoreRow(Mastermind.RowState,Mastermind.RowState)">
+            <summary>
+            Calculate and generate the row score
+            </summary>
+            <param name="State">The row to score</param>
+            <param name="Answer">The answer key</param>
+        </member>
+        <member name="M:Mastermind.GameBoard.AddGuess(Mastermind.RowState)">
+            <summary>
+            Add a guess to the game board
+            </summary>
+            <param name="Guess">The guess to add</param>
+            <returns>True if the guess was added</returns>
+        </member>
+        <member name="M:Mastermind.GameBoard.Reset">
+            <summary>
+            Clears the board and resets the game state to in progress
+            </summary>
+        </member>
+        <member name="T:Mastermind.GeneticAlgorithm`2">
+            <summary>
+            A generic implementation of a genetic algorithm.
+            </summary>
+            <typeparam name="TItem">The type of the item to optimize.</typeparam>
+            <typeparam name="TItemFactory">Factory that generates items of type T.</typeparam>
+        </member>
+        <member name="P:Mastermind.GeneticAlgorithm`2.Pool">
+            <summary>
+            Genetic pool of items T with scores
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticAlgorithm`2.PoolSize">
+            <summary>
+            Gets the size of the pool.
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.GetEnumerator">
+            <summary>
+            Gets an enumerator for the genetic pool.
+            </summary>
+            <returns>The pool enumerator.</returns>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.GetPoolItem(System.Int32)">
+            <summary>
+            Gets a pool item by index (ordered by score)
+            </summary>
+            <param name="Index">The index to retreive.</param>
+            <returns>The pool item at the specified index.</returns>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.#ctor(`1)">
+            <summary>
+            Generic GeneticAlgorithm constructor
+            </summary>
+            <param name="PoolItemFactory">Factory implementation that generates items of type T.</param>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.GeneratePool(System.Int32)">
+            <summary>
+            Initializes the genetic pool with random data.
+            </summary>
+            <param name="Size">The desired size of the new pool.</param>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.ScoreAndSortPool">
+            <summary>
+            Scores the pool and sorts it.
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.SortPool">
+            <summary>
+            Sorts the pool
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.ShufflePool">
+            <summary>
+            Randomly shuffles the pool.
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.SelectIndexWeighted(System.Int32)">
+            <summary>
+            Chooses a random integer index using a negative linear falloff function of P(x) = -1*x + 1.
+            </summary>
+            <param name="MaxIndexInclusive">Maximum number than can be returned.</param>
+            <returns>Random weighted number.</returns>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.SelectIndexWeighted(System.Int32,System.Int32)">
+            <summary>
+            <see cref="M:Mastermind.GeneticAlgorithm`2.SelectIndexWeighted(System.Int32)"/>
+            </summary>
+            <param name="MinimumIndexInclusive">Minimum number that can be returned</param>
+            <param name="MaxIndexInclusive"><see cref="M:Mastermind.GeneticAlgorithm`2.SelectIndexWeighted(System.Int32)"/></param>
+            <returns><see cref="M:Mastermind.GeneticAlgorithm`2.SelectIndexWeighted(System.Int32)"/></returns>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithm`2.Evolve(System.Int32,System.Double,System.Double)">
+            <summary>
+            Performs the standard genetic evolution operations of the pool.
+            </summary>
+            <param name="ElitismCutoff">Number of high scoring members to copy unmodified.</param>
+            <param name="CrossoverChance">Total pool ratio that undergoes crossover operations.</param>
+            <param name="MutationChance">Total pool ratio that undergoes mutation operations.</param>
+        </member>
+        <member name="T:Mastermind.GeneticAlgorithmPoolMember`1">
+            <summary>
+            Generic pool member used by the generic alogrithm to hold an item of type T and an evaluation score.
+            </summary>
+            <typeparam name="T">Type of pool item</typeparam>
+        </member>
+        <member name="P:Mastermind.GeneticAlgorithmPoolMember`1.Item">
+            <summary>
+            Item being evaluated.
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticAlgorithmPoolMember`1.Score">
+            <summary>
+            Item fitness score.
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.#ctor(`0,System.Int32)">
+            <summary>
+            Constructor for GeneticAlgorithmPoolMember.
+            </summary>
+            <param name="Item"><see cref="P:Mastermind.GeneticAlgorithmPoolMember`1.Item"/></param>
+            <param name="Score"><see cref="P:Mastermind.GeneticAlgorithmPoolMember`1.Score"/></param>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.CompareTo(Mastermind.GeneticAlgorithmPoolMember{`0})">
+            <see cref="M:System.IComparable.CompareTo(System.Object)"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.Equals(System.Object)">
+            <see cref="M:System.Object.Equals(System.Object)"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.GetHashCode">
+            <see cref="M:System.Object.GetHashCode"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.Equals(Mastermind.GeneticAlgorithmPoolMember{`0})">
+            <see cref="M:System.IEquatable`1.Equals(`0)"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.op_Equality(Mastermind.GeneticAlgorithmPoolMember{`0},Mastermind.GeneticAlgorithmPoolMember{`0})">
+            <see cref="T:System.Object"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.op_Inequality(Mastermind.GeneticAlgorithmPoolMember{`0},Mastermind.GeneticAlgorithmPoolMember{`0})">
+            <see cref="T:System.Object"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.op_LessThan(Mastermind.GeneticAlgorithmPoolMember{`0},Mastermind.GeneticAlgorithmPoolMember{`0})">
+            <see cref="T:System.Object"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.op_GreaterThan(Mastermind.GeneticAlgorithmPoolMember{`0},Mastermind.GeneticAlgorithmPoolMember{`0})">
+            <see cref="T:System.Object"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.op_LessThanOrEqual(Mastermind.GeneticAlgorithmPoolMember{`0},Mastermind.GeneticAlgorithmPoolMember{`0})">
+            <see cref="T:System.Object"/>
+        </member>
+        <member name="M:Mastermind.GeneticAlgorithmPoolMember`1.op_GreaterThanOrEqual(Mastermind.GeneticAlgorithmPoolMember{`0},Mastermind.GeneticAlgorithmPoolMember{`0})">
+            <see cref="T:System.Object"/>
+        </member>
+        <member name="M:Mastermind.GeneticSettings.ValidateBox``1(System.Windows.Forms.TextBox,``0,``0)">
+            <summary>
+            Validates a text input by parsing and bounds checking. Changes box background on failure.
+            </summary>
+            <typeparam name="T">The desired parsed type, must support "TryParse" and "CompareTo".</typeparam>
+            <param name="Box">The TextBox to parse.</param>
+            <param name="Min">The minimum allowed value.</param>
+            <param name="Max">The maximum allowed value.</param>
+            <returns>True if the text was parsed correctly and is within the bounds.</returns>
+        </member>
+        <member name="M:Mastermind.GeneticSettings.TextBox_Validating(System.Object,System.ComponentModel.CancelEventArgs)">
+            <see cref="M:System.Windows.Forms.Control.OnValidating(System.ComponentModel.CancelEventArgs)"/>
+        </member>
+        <member name="M:Mastermind.GeneticSettings.OKButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Closes the settings form with an ok result.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Button.OnClick(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.GeneticSettings.GeneticSettings_Load(System.Object,System.EventArgs)">
+            <summary>
+            Sets the controls to the initial settings.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Form.OnLoad(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.GeneticSettings.ValidateAll">
+            <summary>
+            Validates all of the form controls.
+            </summary>
+            <returns>True if all controls validated correctly.</returns>
+        </member>
+        <member name="M:Mastermind.GeneticSettings.GeneticSettings_FormClosing(System.Object,System.Windows.Forms.FormClosingEventArgs)">
+            <summary>
+            Saves the settings if ok was clicked and the controls validate.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Form.OnFormClosing(System.Windows.Forms.FormClosingEventArgs)"/></param>
+        </member>
+        <member name="F:Mastermind.GeneticSettings.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticSettings.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Mastermind.GeneticSettings.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:Mastermind.GeneticSolver">
+            <summary>
+            A Mastermind solver that uses genetic algorithms.
+            </summary>
+        </member>
+        <member name="E:Mastermind.GeneticSolver.OnStatusChange">
+            <see cref="E:Mastermind.ISolver.OnStatusChange"/>
+        </member>
+        <member name="M:Mastermind.GeneticSolver.#ctor">
+            <summary>
+            Genetic solver constructor
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticSolver.Evolve">
+            <summary>
+            Performs the selection, crossover and mutation operations on the pool
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticSolver.GetGuess(Mastermind.GameBoard)">
+            <see cref="M:Mastermind.ISolver.GetGuess(Mastermind.GameBoard)"/>
+        </member>
+        <member name="M:Mastermind.GeneticSolver.ShowSettingsDialog">
+            <see cref="M:Mastermind.ISolver.ShowSettingsDialog"/>
+        </member>
+        <member name="M:Mastermind.GeneticSolver.Reset">
+            <see cref="M:Mastermind.ISolver.Reset"/>
+        </member>
+        <member name="M:Mastermind.GeneticSolver.Abort">
+            <see cref="M:Mastermind.ISolver.Abort"/>
+        </member>
+        <member name="T:Mastermind.GeneticSolverGuess">
+            <summary>
+            Implementation of IGeneticItem that evaluates a Mastermind row state.
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticSolverGuess.GuessState">
+            <summary>
+            The guess being evaluated.
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuess.#ctor(Mastermind.GameBoard,System.Int32,System.Int32,Mastermind.RowState)">
+            <summary>
+            GeneticSolverGuess constructor.
+            </summary>
+            <param name="Board">The board being used.</param>
+            <param name="MatchScore">Score used when a hard match (same color and place) is found.</param>
+            <param name="PartialMatchScore">Score used when a soft match (same color, different place) is found.</param>
+            <param name="State"><see cref="P:Mastermind.GeneticSolverGuess.GuessState"/></param>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuess.CompareRows(Mastermind.BoardRow)">
+            <summary>
+            Score the row possibility compared to the given guess
+            </summary>
+            <param name="PlayedRow">The previously scored row</param>
+            <returns>0 if the row is a possible fit, decreasing values the worse the fit is</returns>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuess.EvalRow">
+            <summary>
+            Score a row based on all previous guesses
+            </summary>
+            <returns>0 if the row is a possible fit, decreasing values the worse the fit is</returns>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuess.GetScore">
+            <see cref="M:Mastermind.IGeneticItem.GetScore"/>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuess.Clone">
+            <see cref="M:System.ICloneable.Clone"/>
+        </member>
+        <member name="T:Mastermind.GeneticSolverGuessFactory">
+            <summary>
+            Implementation of IGeneticItemFactory that creates and modifies Mastermind row guesses.
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuessFactory.#ctor(Mastermind.GameBoard,Mastermind.GeneticSolverSettings)">
+            <summary>
+            GeneticSolverGuessFactory constructor.
+            </summary>
+            <param name="Board">The board being used.</param>
+            <param name="Settings">Genetic solver tuning parameters.</param>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuessFactory.GetRandom">
+            <see cref="M:Mastermind.IGeneticItemFactory`1.GetRandom"/>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuessFactory.Cross(Mastermind.GeneticSolverGuess,Mastermind.GeneticSolverGuess,Mastermind.GeneticSolverGuess@,Mastermind.GeneticSolverGuess@)">
+            <see cref="M:Mastermind.IGeneticItemFactory`1.Cross(`0,`0,`0@,`0@)"/>
+        </member>
+        <member name="M:Mastermind.GeneticSolverGuessFactory.Mutate(Mastermind.GeneticSolverGuess)">
+            <see cref="M:Mastermind.IGeneticItemFactory`1.Mutate(`0)"/>
+        </member>
+        <member name="T:Mastermind.GeneticSolverSettings">
+            <summary>
+            Holds settings for the solver
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticSolverSettings.PoolSize">
+            <summary>
+            The size of the gene pool
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticSolverSettings.CrossoverAmount">
+            <summary>
+            The number of crossovers to perform (pool*CrossoverAmount), 
+            remainder are elites and mutations
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticSolverSettings.MutationRate">
+            <summary>
+            The rate that colors are mutated (columns*MutationRate) mutations
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticSolverSettings.ElitismCutoff">
+            <summary>
+            The number top scoring pool members that do not 
+            undergo crossovers or mutation
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticSolverSettings.MatchScore">
+            <summary>
+            The penalty score for correct color and spot discrepancies
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticSolverSettings.PartialMatchScore">
+            <summary>
+            The penalty score for correct color but incorrect spot discrepancies
+            </summary>
+        </member>
+        <member name="P:Mastermind.GeneticSolverSettings.MaxGenerations">
+            <summary>
+            The maximum number of generations before forcing a guess
+            </summary>
+        </member>
+        <member name="M:Mastermind.GeneticSolverSettings.Clone">
+            <see cref="M:System.ICloneable.Clone"/>
+        </member>
+        <member name="T:Mastermind.HybridSolver">
+            <summary>
+            A solver implementation that attempts to merge the genetic algorithm and Knuth solvers.
+            </summary>
+        </member>
+        <member name="E:Mastermind.HybridSolver.OnStatusChange">
+            <see cref="E:Mastermind.ISolver.OnStatusChange"/>
+        </member>
+        <member name="M:Mastermind.HybridSolver.#ctor">
+            <summary>
+            HybridSolver constructor.
+            </summary>
+        </member>
+        <member name="M:Mastermind.HybridSolver.GetGuess(Mastermind.GameBoard)">
+            <see cref="M:Mastermind.ISolver.GetGuess(Mastermind.GameBoard)"/>
+        </member>
+        <member name="M:Mastermind.HybridSolver.Reset">
+            <see cref="M:Mastermind.ISolver.Reset"/>
+        </member>
+        <member name="M:Mastermind.HybridSolver.Abort">
+            <see cref="M:Mastermind.ISolver.Abort"/>
+        </member>
+        <member name="M:Mastermind.HybridSolver.ShowSettingsDialog">
+            <see cref="M:Mastermind.ISolver.ShowSettingsDialog"/>
+        </member>
+        <member name="T:Mastermind.IGeneticItem">
+            <summary>
+            Interface for items that can be used for a genetic alogrithm.
+            </summary>
+        </member>
+        <member name="M:Mastermind.IGeneticItem.GetScore">
+            <summary>
+            Calculates the fitness evaluation score.
+            </summary>
+            <returns>Score of this item (more negative is a worse fit).</returns>
+        </member>
+        <member name="T:Mastermind.IGeneticItemFactory`1">
+            <summary>
+            Interface for a factory that can generate IGeneticItems.
+            </summary>
+            <typeparam name="T">Type of IGeneticItems this factory generates.</typeparam>
+        </member>
+        <member name="M:Mastermind.IGeneticItemFactory`1.GetRandom">
+            <summary>
+            Generates a random item.
+            </summary>
+            <returns>A randomly generated item.</returns>
+        </member>
+        <member name="M:Mastermind.IGeneticItemFactory`1.Cross(`0,`0,`0@,`0@)">
+            <summary>
+            Performs a cross operation using parents A and B.
+            </summary>
+            <param name="A">Parent A.</param>
+            <param name="B">Parent B.</param>
+            <param name="ResultA">Result A.</param>
+            <param name="ResultB">Result B.</param>
+        </member>
+        <member name="M:Mastermind.IGeneticItemFactory`1.Mutate(`0)">
+            <summary>
+            Performs a mutation operation using the given parent.
+            </summary>
+            <param name="Item">Parent to mutate.</param>
+            <returns>Mutated output.</returns>
+        </member>
+        <member name="T:Mastermind.ISolver">
+            <summary>
+            This interface is implemented by game solvers
+            </summary>
+        </member>
+        <member name="M:Mastermind.ISolver.GetGuess(Mastermind.GameBoard)">
+            <summary>
+            Gets a new guess for the game
+            </summary>
+            <param name="Board">The board in use</param>
+            <returns>A new guess that should be played</returns>
+        </member>
+        <member name="M:Mastermind.ISolver.ShowSettingsDialog">
+            <summary>
+            Opens a settings dialog for parameter tuning
+            </summary>
+        </member>
+        <member name="M:Mastermind.ISolver.Reset">
+            <summary>
+            Called when the game has been reset
+            </summary>
+        </member>
+        <member name="M:Mastermind.ISolver.Abort">
+            <summary>
+            Called when all long operations must stop immediatly
+            </summary>
+        </member>
+        <member name="E:Mastermind.ISolver.OnStatusChange">
+            <summary>
+            Gets a status message to display to the user
+            </summary>
+        </member>
+        <member name="M:Mastermind.KnuthSettings.KnuthSettings_Load(System.Object,System.EventArgs)">
+            <summary>
+            Initializes the form controls.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Form.OnLoad(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.KnuthSettings.KnuthSettings_FormClosing(System.Object,System.Windows.Forms.FormClosingEventArgs)">
+            <summary>
+            Saves the settings if ok was selected.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Form.OnFormClosing(System.Windows.Forms.FormClosingEventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.KnuthSettings.PoolSizeTextBox_Validating(System.Object,System.ComponentModel.CancelEventArgs)">
+            <summary>
+            Validates the form controls.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Control.OnValidating(System.ComponentModel.CancelEventArgs)"/></param>
+        </member>
+        <member name="F:Mastermind.KnuthSettings.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Mastermind.KnuthSettings.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Mastermind.KnuthSettings.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:Mastermind.KnuthSolver">
+            <summary>
+            An partial implementation of Knuth's algorithm for solving Mastermind.
+            </summary>
+        </member>
+        <member name="E:Mastermind.KnuthSolver.OnStatusChange">
+            <see cref="E:Mastermind.ISolver.OnStatusChange"/>
+        </member>
+        <member name="T:Mastermind.KnuthSolver.KnuthSolverSettings">
+            <summary>
+            Holds settings for the Knuth solver
+            </summary>
+        </member>
+        <member name="F:Mastermind.KnuthSolver.KnuthSolverSettings.MaximumPoolSize">
+            <summary>
+            The maximum allowable pool size
+            </summary>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.KnuthSolverSettings.Clone">
+            <see cref="M:System.ICloneable.Clone"/>
+        </member>
+        <member name="F:Mastermind.KnuthSolver.Pool">
+            <summary>
+            The pool of all possible solutions
+            </summary>
+        </member>
+        <member name="F:Mastermind.KnuthSolver.Generator">
+            <summary>
+            Random generator for lookups
+            </summary>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.FillPool(Mastermind.GameBoard,System.Int32)">
+            <summary>
+            Initializes the pool with a seed guess
+            </summary>
+            <param name="Board">The board being used</param>
+            <param name="SeedRows">The initial guess row index</param>
+        </member>
+        <member name="F:Mastermind.KnuthSolver.OOMTriggered">
+            <summary>
+            Set to true if the pool size was reached in a fill thread
+            </summary>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.FillPool(Mastermind.GameBoard,System.Byte[],System.Int32,System.Int32,System.Int64)">
+            <summary>
+            Initializes the pool with a seed guess
+            </summary>
+            <param name="Board">The board being used</param>
+            <param name="Colors">The current color row being processed, used for recursion</param>
+            <param name="Column">The current column in the color row, used for recursion</param>
+            <param name="SeedRows">The initial guess row index</param>
+            <param name="StartMemory">The inital GC memory load</param>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.GeneratePool(Mastermind.GameBoard,System.Int32)">
+            <summary>
+            Create and fill the guess pool
+            </summary>
+            <param name="Board">The board being used</param>
+            <param name="SeedRows">The initial guess row index</param>
+            <returns></returns>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.IsConsistent(Mastermind.RowState,Mastermind.BoardRow)">
+            <summary>
+            Checks if the row is a possible solution given the scored row
+            </summary>
+            <param name="Colors">The row to check</param>
+            <param name="Row">A played row with score</param>
+            <returns>True if the row can be a solution</returns>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.Evolve(Mastermind.GameBoard)">
+            <summary>
+            Removes impossible guesses from the pool given new information
+            </summary>
+            <param name="Board">The board being used</param>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.ChooseGuess">
+            <summary>
+            Picks a possible answer from the pool
+            </summary>
+            <returns>The possible answer to use</returns>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.GetGuess(Mastermind.GameBoard)">
+            <see cref="M:Mastermind.ISolver.GetGuess(Mastermind.GameBoard)"/>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.Reset">
+            <see cref="M:Mastermind.ISolver.Reset"/>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.Abort">
+            <see cref="M:Mastermind.ISolver.Abort"/>
+        </member>
+        <member name="M:Mastermind.KnuthSolver.ShowSettingsDialog">
+            <see cref="M:Mastermind.ISolver.ShowSettingsDialog"/>
+        </member>
+        <member name="T:Mastermind.MainMenu">
+            <summary>
+            The main form of the program
+            </summary>
+        </member>
+        <member name="M:Mastermind.MainMenu.#ctor">
+            <summary>
+            Creates the main form of the program
+            </summary>
+        </member>
+        <member name="M:Mastermind.MainMenu.GenerateGame">
+            <summary>
+            Resets the global game state and sets up a new game.
+            </summary>
+        </member>
+        <member name="M:Mastermind.MainMenu.UpdateGameState">
+            <summary>
+            Updates the game state label.
+            </summary>
+        </member>
+        <member name="M:Mastermind.MainMenu.MainMenu_Load(System.Object,System.EventArgs)">
+            <see cref="M:System.Windows.Forms.Form.OnLoad(System.EventArgs)"/>
+        </member>
+        <member name="M:Mastermind.MainMenu.MainMenu_Shown(System.Object,System.EventArgs)">
+            <see cref="M:System.Windows.Forms.Form.OnShown(System.EventArgs)"/>
+        </member>
+        <member name="M:Mastermind.MainMenu.AITypeComboBox_SelectedIndexChanged(System.Object,System.EventArgs)">
+            <see cref="M:System.Windows.Forms.ComboBox.OnSelectedIndexChanged(System.EventArgs)"/>
+        </member>
+        <member name="M:Mastermind.MainMenu.OnSetMessage(System.String)">
+            <summary>
+            Callback event when the solver wants to display a message.
+            </summary>
+            <param name="Message">Message to display.</param>
+        </member>
+        <member name="M:Mastermind.MainMenu.SolverButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Shows the currently selected solver's settings dialog.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Control.OnClick(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.MainMenu.GetGuess">
+            <summary>
+            Gets a guess from the current AI system. Runs in a separate thread.
+            </summary>
+        </member>
+        <member name="M:Mastermind.MainMenu.GuessButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Begins the process of getting a guess.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Control.OnClick(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.MainMenu.ResetButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Resets the game at the user's request.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Control.OnClick(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.MainMenu.BoardSettingsButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Opens the game board settings dialog.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Control.OnClick(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.MainMenu.AnswerKeyControl_OnAnswerChanged(Mastermind.RowState)">
+            <summary>
+            Called when the answer is changed by the user. Either rejects the 
+            user input or generates a new game.
+            </summary>
+            <param name="NewAnswer">The answer the user selected.</param>
+        </member>
+        <member name="M:Mastermind.MainMenu.TestButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Opens the test run form.
+            </summary>
+            <param name="sender">The control handle.</param>
+            <param name="e"><see cref="M:System.Windows.Forms.Control.OnClick(System.EventArgs)"/></param>
+        </member>
+        <member name="M:Mastermind.MainMenu.TestingForm_OnCancelClicked(Mastermind.TestForm)">
+            <summary>
+            Called when the user wants to cancel the testing routine.
+            </summary>
+            <param name="Sender">The test form handle.</param>
+        </member>
+        <member name="M:Mastermind.MainMenu.TestingForm_OnRunClicked(Mastermind.TestForm,System.Int32)">
+            <summary>
+            Begins a test run.
+            </summary>
+            <param name="Sender">The test form handle.</param>
+            <param name="Iterations">The number of runs to perform.</param>
+        </member>
+        <member name="F:Mastermind.MainMenu.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Mastermind.MainMenu.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Mastermind.MainMenu.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:Mastermind.Program.Main">
+            <summary>
+            The main entry point for the application.
+            </summary>
+        </member>
+        <member name="T:Mastermind.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.Error">
+            <summary>
+              Looks up a localized string similar to Error.
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.GameStateLabel_Aborting">
+            <summary>
+              Looks up a localized string similar to Aborting....
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.GameStateLabel_InProgress">
+            <summary>
+              Looks up a localized string similar to Game In Progress.
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.GameStateLabel_Lost">
+            <summary>
+              Looks up a localized string similar to Game Lost!.
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.GameStateLabel_Won">
+            <summary>
+              Looks up a localized string similar to Game Won!.
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.GeneticSettingsForm_NoParseMethod">
+            <summary>
+              Looks up a localized string similar to No TryParse method defined for type..
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.KnuthSolver_OutOfMemory">
+            <summary>
+              Looks up a localized string similar to Maximum pool size exceeded..
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.Notice">
+            <summary>
+              Looks up a localized string similar to Notice.
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.RandomSolver_NoSettings">
+            <summary>
+              Looks up a localized string similar to No settings for this solver..
+            </summary>
+        </member>
+        <member name="P:Mastermind.Properties.Resources.TestForm_StopTests">
+            <summary>
+              Looks up a localized string similar to Stop tests before closing this window..
+            </summary>
+        </member>
+        <member name="T:Mastermind.RandomSolver">
+            <summary>
+            Generates totally random guesses, mainly used for testing
+            </summary>
+        </member>
+        <member name="E:Mastermind.RandomSolver.OnStatusChange">
+            <see cref="E:Mastermind.ISolver.OnStatusChange"/>
+        </member>
+        <member name="M:Mastermind.RandomSolver.GetGuess(Mastermind.GameBoard)">
+            <see cref="M:Mastermind.ISolver.GetGuess(Mastermind.GameBoard)"/>
+        </member>
+        <member name="M:Mastermind.RandomSolver.ShowSettingsDialog">
+            <see cref="M:Mastermind.ISolver.ShowSettingsDialog"/>
+        </member>
+        <member name="M:Mastermind.RandomSolver.Reset">
+            <see cref="M:Mastermind.ISolver.Reset"/>
+        </member>
+        <member name="M:Mastermind.RandomSolver.Abort">
+            <see cref="M:Mastermind.ISolver.Abort"/>
+        </member>
+        <member name="T:Mastermind.SeedGuess">
+            <summary>
+            Generates generic seed guesses.
+            </summary>
+        </member>
+        <member name="M:Mastermind.SeedGuess.GetGuess(Mastermind.GameBoard)">
+            <summary>
+            Get a seed guess using a modified Knuth system.
+            </summary>
+            <param name="Board">The board in use.</param>
+            <returns>A random guess.</returns>
+        </member>
+        <member name="M:Mastermind.TestForm.TestForm_Load(System.Object,System.EventArgs)">
+            <see cref="M:System.Windows.Forms.Form.OnLoad(System.EventArgs)"/>
+        </member>
+        <member name="M:Mastermind.TestForm.SetButtonStates">
+            <summary>
+            Enables and disables the run and stop buttons based on the current state.
+            </summary>
+        </member>
+        <member name="F:Mastermind.TestForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Mastermind.TestForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Mastermind.TestForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+    </members>
+</doc>

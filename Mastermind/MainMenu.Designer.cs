@@ -95,7 +95,7 @@
 			this.GameStateLabel.Name = "GameStateLabel";
 			this.GameStateLabel.Size = new System.Drawing.Size(51, 20);
 			this.GameStateLabel.TabIndex = 7;
-			this.GameStateLabel.Text = "label1";
+			this.GameStateLabel.Text = "";
 			// 
 			// ResetButton
 			// 
@@ -186,7 +186,6 @@
 			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
-
 		}
 
 		#endregion

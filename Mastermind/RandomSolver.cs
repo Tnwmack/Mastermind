@@ -8,19 +8,22 @@ namespace Mastermind
 	/// </summary>
 	class RandomSolver : ISolver
 	{
+		/// <see cref="ISolver.OnStatusChange"/>
 		public event Action<string> OnStatusChange;
+
 		private Random Generator = new Random();
 
 		/// <see cref="ISolver.GetGuess"/>
 		public RowState GetGuess(GameBoard Board)
 		{
+			OnStatusChange?.Invoke("");
 			return RowState.GetRandomColors(Generator, Board.NumColors, Board.NumColumns);
 		}
 
 		/// <see cref="ISolver.ShowSettingsDialog"/>
 		public void ShowSettingsDialog()
 		{
-			MessageBox.Show("No settings for this solver.", "Random Guess", 
+			MessageBox.Show(Properties.Resources.RandomSolver_NoSettings, Properties.Resources.Notice, 
 				MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 

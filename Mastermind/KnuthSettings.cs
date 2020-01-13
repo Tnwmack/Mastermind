@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace Mastermind
 {
@@ -26,7 +27,7 @@ namespace Mastermind
 		/// <param name="e"><see cref="Form.OnLoad(EventArgs)"/></param>
 		private void KnuthSettings_Load(object sender, EventArgs e)
 		{
-			PoolSizeTextBox.Text = Settings.MaximumPoolSize.ToString();
+			PoolSizeTextBox.Text = Settings.MaximumPoolSize.ToString(CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>
@@ -38,7 +39,7 @@ namespace Mastermind
 		{
 			if(DialogResult == DialogResult.OK)
 			{
-				Settings.MaximumPoolSize = int.Parse(PoolSizeTextBox.Text);
+				Settings.MaximumPoolSize = int.Parse(PoolSizeTextBox.Text, CultureInfo.InvariantCulture);
 			}
 		}
 

@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Mastermind
 {
+	/// <summary>
+	/// An partial implementation of Knuth's algorithm for solving Mastermind.
+	/// </summary>
 	class KnuthSolver : ISolver
 	{
+		/// <see cref="ISolver.OnStatusChange"/>
 		public event Action<string> OnStatusChange;
 
 		private volatile bool AbortProcessing = false;
@@ -44,7 +45,7 @@ namespace Mastermind
 		/// <summary>
 		/// Random generator for lookups
 		/// </summary>
-		private Random Generator = new Random();
+		private readonly Random Generator = new Random();
 
 		/// <summary>
 		/// Initializes the pool with a seed guess
@@ -111,7 +112,7 @@ namespace Mastermind
 
 					for (int r = 0; r < SeedRows; r++)
 					{
-						if (!IsConsistent(NewMember, Board.Guesses[r], Board))
+						if (!IsConsistent(NewMember, Board.Guesses[r]))
 						{
 							Consistent = false;
 							break;
@@ -185,7 +186,7 @@ namespace Mastermind
 
 			catch (System.OutOfMemoryException)
 			{
-				MessageBox.Show("Maximum pool size exceeded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(Properties.Resources.KnuthSolver_OutOfMemory, Properties.Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				Reset();
 				return false;
 			}
@@ -193,9 +194,9 @@ namespace Mastermind
 			return true;
 		}
 
-		private bool EarlyIsConsistent(RowState Colors, BoardRow Row, int Cutoff)
+		private static bool EarlyIsConsistent(RowState Colors, BoardRow Row, int Cutoff)
 		{
-		int SamePosAndColor = 0, SameColor = 0;
+			int SamePosAndColor = 0;
 
 			for (int i = 0; i < Cutoff; i ++)
 			{
@@ -209,7 +210,8 @@ namespace Mastermind
 				return false;
 
 			//This section doesn't work, but may not be needed
-			/*bool[] Matched = new bool[Colors.Length];
+			/*int SameColor = 0;
+			 * bool[] Matched = new bool[Colors.Length];
 
 			for (int i = 0; i < Colors.Length / 2; i ++)
 			{
@@ -235,17 +237,15 @@ namespace Mastermind
 		/// </summary>
 		/// <param name="Colors">The row to check</param>
 		/// <param name="Row">A played row with score</param>
-		/// <param name="Board">The game board in use.</param>
 		/// <returns>True if the row can be a solution</returns>
-		private bool IsConsistent(RowState Colors, BoardRow Row, GameBoard Board)
+		private static bool IsConsistent(RowState Colors, BoardRow Row)
 		{
 		int SamePosAndColor = 0, SameColor = 0;
 
 			//if (Colors == Board.Answer)
 			//	System.Diagnostics.Debugger.Break();
 
-			//Optimization, counting backwards is supposedly faster since a NZ test is faster than a less than
-			for (int i = Colors.Length - 1; i >= 0; i--)
+			for (int i = 0; i < Colors.Length; i ++)
 			{
 				if (Colors[i] == Row.Row[i])
 				{
@@ -295,7 +295,7 @@ namespace Mastermind
 
 					while(Pool.TryTake(out Row) && !AbortProcessing)
 					{
-						if (IsConsistent(Row, LastGuess, Board))
+						if (IsConsistent(Row, LastGuess))
 						{
 							NewPool.Add(Row);
 						}
@@ -348,7 +348,7 @@ namespace Mastermind
 				Evolve(Board);
 			}
 
-			OnStatusChange?.Invoke("Pool Size: " + Pool.Count.ToString("##,#"));
+			OnStatusChange?.Invoke("Pool Size: " + Pool.Count.ToString("##,#", System.Globalization.CultureInfo.CurrentCulture));
 
 			return ChooseGuess();
 		}

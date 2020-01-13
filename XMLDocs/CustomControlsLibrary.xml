@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CustomControlsLibrary</name>
+    </assembly>
+    <members>
+        <member name="T:CustomControlsLibrary.AnswerControl">
+            <summary>
+            A mastermind answer display control
+            </summary>
+        </member>
+        <member name="T:CustomControlsLibrary.AnswerControl.OnAnswerChangedDelegate">
+            <summary>
+            <see cref="E:CustomControlsLibrary.AnswerControl.OnAnswerChanged"/> 
+            </summary>
+            <param name="NewAnswer">The new answer key selected</param>
+        </member>
+        <member name="E:CustomControlsLibrary.AnswerControl.OnAnswerChanged">
+            <summary>
+            Called when the answer is changed
+            </summary>
+        </member>
+        <member name="F:CustomControlsLibrary.AnswerControl.Colors">
+            <summary>
+            The color mapping to use
+            </summary>
+        </member>
+        <member name="P:CustomControlsLibrary.AnswerControl.CurrentAnswer">
+            <summary>
+            The answer currently displayed
+            </summary>
+        </member>
+        <member name="P:CustomControlsLibrary.AnswerControl.Columns">
+            <summary>
+            The number of columns displayed
+            </summary>
+        </member>
+        <member name="P:CustomControlsLibrary.AnswerControl.NumColors">
+            <summary>
+            The number of colors to choose from
+            </summary>
+        </member>
+        <member name="P:CustomControlsLibrary.AnswerControl.PegBorderSize">
+            <summary>
+            The size of the black peg border in pixels
+            </summary>
+        </member>
+        <member name="M:CustomControlsLibrary.AnswerControl.#ctor">
+            <summary>
+            Creates a new answer control
+            </summary>
+        </member>
+        <member name="M:CustomControlsLibrary.AnswerControl.SetAnswer(Mastermind.RowState)">
+            <summary>
+            Change the displayed answer. 
+            </summary>
+            <remarks>Does not trigger the OnAnswerChanged event.</remarks>
+            <param name="NewAnswer">The answer to display</param>
+        </member>
+        <member name="M:CustomControlsLibrary.AnswerControl.GetPegRect(System.Int32)">
+            <summary>
+            Get the rect the given peg occupies
+            </summary>
+            <param name="Column">The peg column</param>
+            <returns>The rectangle the peg occupies</returns>
+        </member>
+        <member name="M:CustomControlsLibrary.AnswerControl.OnPaint(System.Windows.Forms.PaintEventArgs)">
+            <summary>
+            Paints the control
+            </summary>
+            <param name="pe">The paint parameters</param>
+        </member>
+        <member name="M:CustomControlsLibrary.AnswerControl.OnMouseDown(System.Windows.Forms.MouseEventArgs)">
+            <summary>
+            Changes the displayed peg on the answer key
+            </summary>
+            <param name="e">Mouse event data</param>
+        </member>
+        <member name="F:CustomControlsLibrary.AnswerControl.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:CustomControlsLibrary.AnswerControl.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:CustomControlsLibrary.AnswerControl.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:CustomControlsLibrary.BoardControl">
+            <summary>
+            A mastermind board display control
+            </summary>
+        </member>
+        <member name="F:CustomControlsLibrary.BoardControl.Colors">
+            <summary>
+            The color mapping to use
+            </summary>
+        </member>
+        <member name="P:CustomControlsLibrary.BoardControl.Columns">
+            <summary>
+            The number of columns
+            </summary>
+        </member>
+        <member name="P:CustomControlsLibrary.BoardControl.ScoreColumnWidth">
+            <summary>
+            The width of the score column in pixels
+            </summary>
+        </member>
+        <member name="P:CustomControlsLibrary.BoardControl.PegBorderSize">
+            <summary>
+            The size of the black peg border in pixels
+            </summary>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.#ctor">
+            <summary>
+            Creates a new board control
+            </summary>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.AddRow(Mastermind.BoardRow)">
+            <summary>
+            Add a new row to the control
+            </summary>
+            <param name="NewRow">The new row to add</param>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.ResetBoard">
+            <summary>
+            Clears the board
+            </summary>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.GetScoreRect(System.Int32,System.Single)">
+            <summary>
+            Gets the location to draw the row score
+            </summary>
+            <param name="Row">The row number</param>
+            <param name="MinHeight">The minimum row height</param>
+            <returns>The location to draw the score</returns>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.GetPegRect(System.Int32,System.Int32,System.Single)">
+            <summary>
+            Gets the location to draw the peg
+            </summary>
+            <param name="Column">The peg column</param>
+            <param name="Row">The peg row</param>
+            <param name="MinHeight">The minimum row height</param>
+            <returns>The location to draw the peg</returns>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.OnScroll(System.Windows.Forms.ScrollEventArgs)">
+            <summary>
+            Called when the scrollbar is moved
+            </summary>
+            <param name="se">The scroll parameters</param>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.OnPaint(System.Windows.Forms.PaintEventArgs)">
+            <summary>
+            Paints the control
+            </summary>
+            <param name="pe">The paint parameters</param>
+        </member>
+        <member name="F:CustomControlsLibrary.BoardControl.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:CustomControlsLibrary.BoardControl.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+    </members>
+</doc>

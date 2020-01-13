@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace Mastermind
 {
@@ -24,7 +25,7 @@ namespace Mastermind
 		public event OnStopClickedDelegate OnStopClicked;
 
 		private bool TestInProgress = false;
-		private Dictionary<Control, String> LabelText = new Dictionary<Control, string>();
+		private readonly Dictionary<Control, String> LabelText = new Dictionary<Control, string>();
 
 		/// <see cref="Form.OnLoad(EventArgs)"/>
 		private void TestForm_Load(object sender, EventArgs e)
@@ -81,7 +82,7 @@ namespace Mastermind
 		{
 			if(TestInProgress)
 			{
-				MessageBox.Show("Stop tests before closing this window", "Error", 
+				MessageBox.Show(Properties.Resources.TestForm_StopTests, Properties.Resources.Error, 
 					MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 				e.Cancel = true;
 			}
@@ -104,10 +105,10 @@ namespace Mastermind
 			}
 			else
 			{
-				IterationLabel.Text = string.Format("{0} {1}", LabelText[IterationLabel], IterationCount);
-				TimeLabel.Text = string.Format("{0} {1:G3}", LabelText[TimeLabel], AverageTime);
-				GuessesLabel.Text = string.Format("{0} {1:G3}", LabelText[GuessesLabel], AverageGuesses);
-				FailuresLabel.Text = string.Format("{0} {1}", LabelText[FailuresLabel], NumFailures);
+				IterationLabel.Text = string.Format(CultureInfo.CurrentCulture, "{0} {1}", LabelText[IterationLabel], IterationCount);
+				TimeLabel.Text = string.Format(CultureInfo.CurrentCulture, "{0} {1:G3}", LabelText[TimeLabel], AverageTime);
+				GuessesLabel.Text = string.Format(CultureInfo.CurrentCulture, "{0} {1:G3}", LabelText[GuessesLabel], AverageGuesses);
+				FailuresLabel.Text = string.Format(CultureInfo.CurrentCulture, "{0} {1}", LabelText[FailuresLabel], NumFailures);
 			}
 		}
 	}

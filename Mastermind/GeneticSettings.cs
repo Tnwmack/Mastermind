@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace Mastermind
 {
 	partial class GeneticSettings : Form
 	{
-		public GeneticSolver.GeneticSolverSettings Settings;
+		public GeneticSolverSettings Settings;
 
-		public GeneticSettings(GeneticSolver.GeneticSolverSettings Settings)
+		public GeneticSettings(GeneticSolverSettings Settings)
 		{
 			this.Settings = Settings;
 			InitializeComponent();
@@ -38,7 +39,7 @@ namespace Mastermind
 		System.Reflection.MethodInfo TryParseMethod = typeof(T).GetMethod("TryParse", ArgTypes);
 
 			if (TryParseMethod == null)
-				throw new ArgumentException("No TryParse method defined for type");
+				throw new ArgumentException(Properties.Resources.GeneticSettingsForm_NoParseMethod);
 
 		object[] args = { Box.Text, null };
 		bool Parsed = (bool)TryParseMethod.Invoke(null, args);
@@ -95,13 +96,13 @@ namespace Mastermind
 			if (Settings == null)
 				return;
 
-			PoolSizeTextBox.Text = Settings.PoolSize.ToString();
-			CrossoversTextBox.Text = Settings.CrossoverAmount.ToString();
-			MutationTextBox.Text = Settings.MutationRate.ToString();
-			ElitismTextBox.Text = Settings.ElitismCutoff.ToString();
-			MatchTextBox.Text = Settings.MatchScore.ToString();
-			PartialTextBox.Text = Settings.PartialMatchScore.ToString();
-			GenerationsTextBox.Text = Settings.MaxGenerations.ToString();
+			PoolSizeTextBox.Text = Settings.PoolSize.ToString(CultureInfo.InvariantCulture);
+			CrossoversTextBox.Text = Settings.CrossoverAmount.ToString(CultureInfo.InvariantCulture);
+			MutationTextBox.Text = Settings.MutationRate.ToString(CultureInfo.InvariantCulture);
+			ElitismTextBox.Text = Settings.ElitismCutoff.ToString(CultureInfo.InvariantCulture);
+			MatchTextBox.Text = Settings.MatchScore.ToString(CultureInfo.InvariantCulture);
+			PartialTextBox.Text = Settings.PartialMatchScore.ToString(CultureInfo.InvariantCulture);
+			GenerationsTextBox.Text = Settings.MaxGenerations.ToString(CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>
@@ -149,13 +150,13 @@ namespace Mastermind
 					return;
 				}
 
-				Settings.PoolSize = int.Parse(PoolSizeTextBox.Text);
-				Settings.CrossoverAmount = float.Parse(CrossoversTextBox.Text);
-				Settings.MutationRate = float.Parse(MutationTextBox.Text);
-				Settings.ElitismCutoff = int.Parse(ElitismTextBox.Text);
-				Settings.MatchScore = int.Parse(MatchTextBox.Text);
-				Settings.PartialMatchScore = int.Parse(PartialTextBox.Text);
-				Settings.MaxGenerations = int.Parse(GenerationsTextBox.Text);
+				Settings.PoolSize = int.Parse(PoolSizeTextBox.Text, CultureInfo.InvariantCulture);
+				Settings.CrossoverAmount = float.Parse(CrossoversTextBox.Text, CultureInfo.InvariantCulture);
+				Settings.MutationRate = float.Parse(MutationTextBox.Text, CultureInfo.InvariantCulture);
+				Settings.ElitismCutoff = int.Parse(ElitismTextBox.Text, CultureInfo.InvariantCulture);
+				Settings.MatchScore = int.Parse(MatchTextBox.Text, CultureInfo.InvariantCulture);
+				Settings.PartialMatchScore = int.Parse(PartialTextBox.Text, CultureInfo.InvariantCulture);
+				Settings.MaxGenerations = int.Parse(GenerationsTextBox.Text, CultureInfo.InvariantCulture);
 			}
 		}
 	}

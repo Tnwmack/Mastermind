@@ -15,10 +15,12 @@ namespace Mastermind
 	/// </summary>
 	public partial class MainMenu : Form
 	{
-		private Game Master;
-		private ColorMapper Colors = new ColorMapper();
+		private readonly Game Master;
+		private readonly ColorMapper Colors = new ColorMapper();
 
 		private volatile bool GuessThreadWorking = false;
+
+		private readonly Timer CloseTimer = new Timer();
 
 		/// <summary>
 		/// Creates the main form of the program
@@ -26,6 +28,9 @@ namespace Mastermind
 		public MainMenu()
 		{
 			InitializeComponent();
+			
+			components = new Container();
+			components.Add(CloseTimer); //This is so CloseTimer will be disposed on form close in the designer created Dispose method
 
 			GameBoardControl.Colors = Colors;
 			AnswerKeyControl.Colors = Colors;
@@ -83,19 +88,19 @@ namespace Mastermind
 				case GameBoard.GameState.InProgress:
 					GameStateLabel.Font = new Font("Microsoft Sans Serif", 8.0f, FontStyle.Regular, GraphicsUnit.Point);
 					GameStateLabel.ForeColor = SystemColors.ControlText;
-					GameStateLabel.Text = "Game In Progress";
+					GameStateLabel.Text = Properties.Resources.GameStateLabel_InProgress;
 					break;
 
 				case GameBoard.GameState.Won:
 					GameStateLabel.Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold, GraphicsUnit.Point);
 					GameStateLabel.ForeColor = Color.Green;
-					GameStateLabel.Text = "Game Won!";
+					GameStateLabel.Text = Properties.Resources.GameStateLabel_Won;
 					break;
 
 				case GameBoard.GameState.Lost:
 					GameStateLabel.Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold, GraphicsUnit.Point);
 					GameStateLabel.ForeColor = Color.DarkRed;
-					GameStateLabel.Text = "Game Lost!";
+					GameStateLabel.Text = Properties.Resources.GameStateLabel_Lost;
 					break;
 			}
 		}
@@ -138,7 +143,11 @@ namespace Mastermind
 			}
 		}
 
-		public void OnSetMessage(string Message)
+		/// <summary>
+		/// Callback event when the solver wants to display a message.
+		/// </summary>
+		/// <param name="Message">Message to display.</param>
+		private void OnSetMessage(string Message)
 		{
 			SolverStatusLabel.Text = Message;
 		}
@@ -214,16 +223,17 @@ namespace Mastermind
 			if (GuessThreadWorking)
 				return;
 
-		BoardSettingsForm SettForm = new BoardSettingsForm(Master.Settings);
-
-			if(SettForm.ShowDialog() == DialogResult.OK)
+			using (BoardSettingsForm SettForm = new BoardSettingsForm(Master.Settings))
 			{
-				Master.SetBoardSettings((BoardSettings)SettForm.Settings.Clone());
+				if (SettForm.ShowDialog() == DialogResult.OK)
+				{
+					Master.SetBoardSettings((BoardSettings)SettForm.Settings.Clone());
 
-				AnswerKeyControl.SetAnswer(new RowState(new byte[Master.Settings.Columns]));
-				AnswerKeyControl.NumColors = Master.Settings.Colors;
+					AnswerKeyControl.SetAnswer(new RowState(new byte[Master.Settings.Columns]));
+					AnswerKeyControl.NumColors = Master.Settings.Colors;
 
-				GenerateGame();
+					GenerateGame();
+				}
 			}
 		}
 
@@ -236,7 +246,7 @@ namespace Mastermind
 		{
 			if (GuessThreadWorking)
 			{
-				AnswerKeyControl.SetAnswer(Master.Board.Answer);
+				AnswerKeyControl.SetAnswer(Master.Board.Answer); //Reset answer
 				return;
 			}
 
@@ -253,11 +263,13 @@ namespace Mastermind
 			if (GuessThreadWorking)
 				return;
 
-			TestForm TestingForm = new TestForm();
-			TestingForm.OnRunClicked += TestingForm_OnRunClicked;
-			TestingForm.OnStopClicked += TestingForm_OnCancelClicked;
+			using (TestForm TestingForm = new TestForm())
+			{
+				TestingForm.OnRunClicked += TestingForm_OnRunClicked;
+				TestingForm.OnStopClicked += TestingForm_OnCancelClicked;
 
-			TestingForm.ShowDialog();
+				TestingForm.ShowDialog();
+			}
 		}
 
 		private volatile bool CancelTesting;
@@ -300,7 +312,7 @@ namespace Mastermind
 
 				while (Master.Board.CurrentGameState == GameBoard.GameState.InProgress)
 				{
-					await Task.Run(new Action(GetGuess));
+					await Task.Run(new Action(GetGuess)).ConfigureAwait(true);
 					GuessRow++;
 				}
 				
@@ -322,34 +334,30 @@ namespace Mastermind
 			Sender.OnTestsCompleted();
 		}
 
-		private Timer CloseTimer;
-
 		private void MainMenu_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (GuessThreadWorking && CloseTimer == null)
+			if (GuessThreadWorking)
 			{
 				e.Cancel = true;
-				SolverStatusLabel.Text = "Closing...";
-				Master.AI.Abort();
 
-				CloseTimer = new Timer();
-				CloseTimer.Interval = 1000;
-
-				CloseTimer.Tick += new EventHandler((s, evt) =>
+				if (!CloseTimer.Enabled)
 				{
-					if (!GuessThreadWorking)
-					{
-						this.Close();
-					}
-				});
+					GameStateLabel.Text = Properties.Resources.GameStateLabel_Aborting;
+					Master.AI.Abort();
 
-				CloseTimer.Start();
-			}
-			else if (CloseTimer != null)
-			{
-				CloseTimer.Stop();
-				CloseTimer.Dispose();
-				CloseTimer = null;
+					CloseTimer.Interval = 1000;
+
+					CloseTimer.Tick += new EventHandler((s, evt) =>
+					{
+						if (!GuessThreadWorking)
+						{
+							CloseTimer.Stop();
+							this.Close();
+						}
+					});
+
+					CloseTimer.Start();
+				}
 			}
 		}
 	}

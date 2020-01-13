@@ -11,7 +11,7 @@ namespace Mastermind
 		/// <summary>
 		/// The settings selected by the user
 		/// </summary>
-		public BoardSettings Settings;
+		public BoardSettings Settings { get; set; }
 
 		/// <summary>
 		/// Creates a new settings dialog
@@ -21,6 +21,7 @@ namespace Mastermind
 		{
 			InitializeComponent();
 
+			InitialSettings ??= new BoardSettings();
 			Settings = (BoardSettings)InitialSettings.Clone();
 
 			if (Settings.Rows > 20)

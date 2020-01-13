@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mastermind
 {
@@ -11,23 +8,25 @@ namespace Mastermind
 	/// </summary>
 	public class GameBoard
 	{
-		private readonly int numColors;
-		private readonly int numColumns;
-		private readonly int numRows;
-		//private int currentRow = 0;
+		/// <summary>
+		/// Called when the game board has changed (eg, a guess was added).
+		/// </summary>
+		public event Action<GameBoard> OnBoardChanged;
 
-		public Action<GameBoard> OnBoardChanged;
-		public Action<GameBoard> OnGameStateChanged;
+		/// <summary>
+		/// Call when the game state has changed (eg, the game was won).
+		/// </summary>
+		public event Action<GameBoard> OnGameStateChanged;
 
 		/// <summary>
 		/// The currently selected answer key
 		/// </summary>
-		public RowState Answer;
+		public RowState Answer { get; set; }
 
 		/// <summary>
 		/// The entered guesses
 		/// </summary>
-		public List<BoardRow> Guesses;
+		public List<BoardRow> Guesses { get; }
 
 		/// <summary>
 		/// States the game can be in
@@ -69,17 +68,17 @@ namespace Mastermind
 		/// <summary>
 		/// The number of colors in play
 		/// </summary>
-		public int NumColors { get { return numColors; } }
+		public int NumColors { get; }
 
 		/// <summary>
 		/// The number of columns in play
 		/// </summary>
-		public int NumColumns { get { return numColumns; } }
+		public int NumColumns { get; }
 
 		/// <summary>
 		/// The number of rows in play
 		/// </summary>
-		public int NumRows { get { return numRows; } }
+		public int NumRows { get; }
 
 		//public int CurrentRow { get { return currentRow; } }
 
@@ -92,9 +91,9 @@ namespace Mastermind
 		/// <param name="Answer">The answer to use</param>
 		public GameBoard(int numColors, int numColumns, int numRows, RowState Answer)
 		{
-			this.numColors = numColors;
-			this.numColumns = numColumns;
-			this.numRows = numRows;
+			NumColors = numColors;
+			NumColumns = numColumns;
+			NumRows = numRows;
 			this.Answer = Answer;
 
 			Guesses = new List<BoardRow>();
@@ -175,6 +174,9 @@ namespace Mastermind
 			return true;
 		}
 
+		/// <summary>
+		/// Clears the board and resets the game state to in progress
+		/// </summary>
 		public void Reset()
 		{
 			Guesses.Clear();

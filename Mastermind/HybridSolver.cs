@@ -1,21 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mastermind
 {
+	/// <summary>
+	/// A solver implementation that attempts to merge the genetic algorithm and Knuth solvers.
+	/// </summary>
 	class HybridSolver : ISolver
 	{
+		/// <see cref="ISolver.OnStatusChange"/>
 		public event Action<string> OnStatusChange;
-		private Action<string> OnSetMessageDelegate; 
 
-		private GeneticSolver GSolver = new GeneticSolver();
-		private KnuthSolver KSolver = new KnuthSolver();
+		private readonly Action<string> OnSetMessageDelegate; 
+
+		private readonly GeneticSolver GSolver = new GeneticSolver();
+		private readonly KnuthSolver KSolver = new KnuthSolver();
 
 		private bool InGeneticMode = true;
 
+		/// <summary>
+		/// HybridSolver constructor.
+		/// </summary>
 		public HybridSolver()
 		{
 			OnSetMessageDelegate = new Action<string>(OnSetMessage);

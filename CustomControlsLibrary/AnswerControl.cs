@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using Mastermind;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Mastermind;
 
 namespace CustomControlsLibrary
 {
@@ -75,8 +69,9 @@ namespace CustomControlsLibrary
 		}
 
 		/// <summary>
-		/// Change the displayed answer
+		/// Change the displayed answer. 
 		/// </summary>
+		/// <remarks>Does not trigger the OnAnswerChanged event.</remarks>
 		/// <param name="NewAnswer">The answer to display</param>
 		public void SetAnswer(RowState NewAnswer)
 		{
