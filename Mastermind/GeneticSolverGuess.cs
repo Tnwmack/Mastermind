@@ -32,13 +32,7 @@ namespace Mastermind
 			this.MatchScore = MatchScore;
 			this.PartialMatchScore = PartialMatchScore;
 			this.GuessState = State;
-
-			RowColumnMatched = new bool[Board.NumColumns]; //TODO: Board.NumColumns looks off here
-			GuessColumnMatched = new bool[Board.NumColumns];
 		}
-
-		private readonly bool[] RowColumnMatched;
-		private readonly bool[] GuessColumnMatched;
 
 		/// <summary>
 		/// Score the row possibility compared to the given guess
@@ -47,33 +41,43 @@ namespace Mastermind
 		/// <returns>0 if the row is a possible fit, decreasing values the worse the fit is</returns>
 		private int CompareRows(BoardRow PlayedRow)
 		{
-			for (int i = 0; i < GuessState.Length; i++)
+			int NumColumns = Board.NumColumns;
+
+		//Copying the rows to the stack before using them is a fair amount faster (cache efficiency?)
+		Span<bool> RowColumnMatched = stackalloc bool[NumColumns];
+		Span<bool> GuessColumnMatched = stackalloc bool[NumColumns];
+
+		Span<byte> GuessStateColumns = stackalloc byte[NumColumns];
+		Span<byte> PlayedRowColumns = stackalloc byte[NumColumns];
+
+			for(int i = 0; i < NumColumns; i ++)
 			{
-				RowColumnMatched[i] = GuessColumnMatched[i] = false;
+				GuessStateColumns[i] = GuessState[i];
+				PlayedRowColumns[i] = PlayedRow.Row[i];
 			}
 
-			int SamePosAndColor = 0, SameColor = 0;
-			int Score = 0;
+		int SamePosAndColor = 0, SameColor = 0;
+		int Score = 0;
 
 			//Score reds
-			for (int i = 0; i < GuessState.Length; i++)
+			for (int i = 0; i<NumColumns; i++)
 			{
-				if (GuessState[i] == PlayedRow.Row[i])
+				if (GuessStateColumns[i] == PlayedRowColumns[i])
 				{
 					SamePosAndColor++;
 					RowColumnMatched[i] = GuessColumnMatched[i] = true;
 				}
-			}
+}
 
-			int MatchDifference = Math.Abs(PlayedRow.Score.NumCorrectSpot - SamePosAndColor);
-			Score -= MatchScore * MatchDifference;
+		int MatchDifference = Math.Abs(PlayedRow.Score.NumCorrectSpot - SamePosAndColor);
+			Score -= MatchScore* MatchDifference;
 
 			//Score whites
-			for (int i = 0; i < GuessState.Length; i++)
+			for (int i = 0; i<NumColumns; i++)
 			{
-				for (int j = 0; j < GuessState.Length && !RowColumnMatched[i]; j++)
+				for (int j = 0; !RowColumnMatched[i] && j<NumColumns; j++)
 				{
-					if (!GuessColumnMatched[j] && (GuessState[i] == PlayedRow.Row[j]))
+					if (!GuessColumnMatched[j] && (GuessStateColumns[i] == PlayedRowColumns[j]))
 					{
 						SameColor++;
 						GuessColumnMatched[j] = true;
@@ -82,8 +86,8 @@ namespace Mastermind
 				}
 			}
 
-			int ColorDifference = Math.Abs(PlayedRow.Score.NumCorrectColor - SameColor);
-			Score -= PartialMatchScore * ColorDifference;
+		int ColorDifference = Math.Abs(PlayedRow.Score.NumCorrectColor - SameColor);
+			Score -= PartialMatchScore* ColorDifference;
 
 			return Score;
 		}

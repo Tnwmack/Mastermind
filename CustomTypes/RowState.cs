@@ -23,6 +23,15 @@ namespace Mastermind
 		}
 
 		/// <summary>
+		/// Creates a new row state
+		/// </summary>
+		/// <param name="InitColors">The colors to use for the row</param>
+		public RowState(Span<byte> InitColors)
+		{
+			Colors = Array.AsReadOnly(InitColors.ToArray());
+		}
+
+		/// <summary>
 		/// Generates a random row
 		/// </summary>
 		/// <param name="RandGenerator">The generator to use</param>
@@ -31,7 +40,7 @@ namespace Mastermind
 		/// <returns>The random row</returns>
 		public static RowState GetRandomColors(Random RandGenerator, int NumColors, int NumColumns)
 		{
-			var NewColors = new byte[NumColumns];
+			Span<byte> NewColors = stackalloc byte[NumColumns];
 
 			for (int i = 0; i < NumColumns; i ++)
 				NewColors[i] = (byte)RandGenerator.Next(0, NumColors);

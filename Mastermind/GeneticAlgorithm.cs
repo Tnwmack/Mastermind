@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Mastermind
@@ -30,7 +31,7 @@ namespace Mastermind
 		/// Gets an enumerator for the genetic pool.
 		/// </summary>
 		/// <returns>The pool enumerator.</returns>
-		public IEnumerator<GeneticAlgorithmPoolMember<TItem>> GetEnumerator() => (IEnumerator<GeneticAlgorithmPoolMember<TItem>>)Pool.GetEnumerator();
+		public IEnumerator<GeneticAlgorithmPoolMember<TItem>> GetEnumerator() => ((IEnumerable<GeneticAlgorithmPoolMember<TItem>>)Pool).GetEnumerator();
 
 		/// <summary>
 		/// Gets a pool item by index (ordered by score)
@@ -140,7 +141,7 @@ namespace Mastermind
 		/// <param name="MutationChance">Total pool ratio that undergoes mutation operations.</param>
 		public void Evolve(int ElitismCutoff, double CrossoverChance, double MutationChance)
 		{
-			//TODO: Add multiple parent option and crossover fitness heuristic
+			//TODO: Add multiple parent option, crossover fitness heuristic and pool reset heuristic
 
 			int NewPoolIndex = 0;
 

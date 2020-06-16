@@ -108,6 +108,12 @@
             </summary>
             <param name="InitColors">The colors to use for the row</param>
         </member>
+        <member name="M:Mastermind.RowState.#ctor(System.Span{System.Byte})">
+            <summary>
+            Creates a new row state
+            </summary>
+            <param name="InitColors">The colors to use for the row</param>
+        </member>
         <member name="M:Mastermind.RowState.GetRandomColors(System.Random,System.Int32,System.Int32)">
             <summary>
             Generates a random row

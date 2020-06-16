@@ -10,7 +10,7 @@ namespace Mastermind
 	{
 		private readonly GameBoard Board;
 		private readonly GeneticSolverSettings Settings;
-		private Random RandGenerator = new Random();
+		private readonly Random RandGenerator = new Random();
 
 		/// <summary>
 		/// GeneticSolverGuessFactory constructor.
@@ -23,9 +23,6 @@ namespace Mastermind
 
 			this.Board = Board;
 			this.Settings = Settings;
-			NewColorA = new byte[Board.NumColumns];
-			NewColorB = new byte[Board.NumColumns];
-			Selected = new bool[Board.NumColumns];
 		}
 
 		/// <see cref="IGeneticItemFactory{GeneticSolverGuess}.GetRandom"/>
@@ -35,15 +32,14 @@ namespace Mastermind
 				RowState.GetRandomColors(RandGenerator, Board.NumColors, Board.NumColumns));
 		}
 
-		private byte[] NewColorA;
-		private byte[] NewColorB;
-		private bool[] Selected;
-
 		/// <see cref="IGeneticItemFactory{GeneticSolverGuess}.Cross"/>
 		public void Cross(GeneticSolverGuess A, GeneticSolverGuess B, out GeneticSolverGuess ResultA, out GeneticSolverGuess ResultB)
 		{
 			Contract.Requires(A != null);
 			Contract.Requires(B != null);
+
+			Span<byte> NewColorA = stackalloc byte[Board.NumColumns];
+			Span<byte> NewColorB = stackalloc byte[Board.NumColumns];
 
 			int SplitIndex = RandGenerator.Next(Board.NumColumns);
 
@@ -67,11 +63,12 @@ namespace Mastermind
 		public GeneticSolverGuess Mutate(GeneticSolverGuess Item)
 		{
 			Contract.Requires(Item != null);
-			
-			Item.GuessState.CopyTo(NewColorA);
 
-			for (int i = 0; i < Selected.Length; i++)
-				Selected[i] = false;
+			Span<byte> Colors = stackalloc byte[Board.NumColumns];
+			Span<bool> Selected = stackalloc bool[Board.NumColumns];
+
+			for (int i = 0; i < Board.NumColumns; i++)
+				Colors[i] = Item.GuessState[i];
 
 			int ColumnsToMutate = RandGenerator.Next(1, Board.NumColumns / 2 + 1);
 
@@ -82,12 +79,13 @@ namespace Mastermind
 				if (!Selected[i])
 				{
 					Selected[i] = true;
-					NewColorA[i] = (byte)RandGenerator.Next(Board.NumColors);
-					ColumnsToMutate--;
+					Colors[i] = (byte)RandGenerator.Next(Board.NumColors);
 				}
-			} while (ColumnsToMutate > 0);
+				else
+					continue;
+			} while (--ColumnsToMutate > 0);
 
-			return new GeneticSolverGuess(Board, Settings.MatchScore, Settings.PartialMatchScore, new RowState(NewColorA));
+			return new GeneticSolverGuess(Board, Settings.MatchScore, Settings.PartialMatchScore, new RowState(Colors));
 		}
 	}
 }
