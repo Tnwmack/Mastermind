@@ -21,6 +21,7 @@ To convert the analysis to an HTML report:
 ## Future Goals
 
  - Implement a simulated annealing solver
+ - Implement a genetic algorithm for the genetic algorithm tuning parameters
  - Replace WinForms with WPF/UWP (or possibly Blazor and convert to a web app)
 
 Trevor Mack

@@ -174,8 +174,13 @@ namespace CustomControlsLibrary
 					g.FillEllipse(PegBackColor, BackgroundPos);
 					g.FillEllipse(Colors.GetBrush(Rows[i].Row[j]), ForgroundPos);
 				}
-				
-				g.DrawString(Rows[i].Score.ToString(), ScoreFont, Brushes.Black, GetScoreRect(i, ScoreSize.Height));
+
+				RectangleF ScorePos = GetScoreRect(i, ScoreSize.Height);
+				RectangleF ColorPos = new RectangleF(new PointF(ScorePos.X, ScorePos.Y + ScorePos.Height / 2.0f),
+					new SizeF(ScoreSize.Width, ScoreSize.Height / 2.0f));
+
+				g.DrawString(Rows[i].Score.NumCorrectSpot.ToString(), ScoreFont, Brushes.Red, ScorePos);
+				g.DrawString(Rows[i].Score.NumCorrectColor.ToString(), ScoreFont, Brushes.Blue, ColorPos);
 			}
 		}
 	}
